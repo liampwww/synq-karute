@@ -1,0 +1,139 @@
+{
+  "app": {
+    "name": "SYNQ Karute",
+    "tagline": "AI Electronic Chart System"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "customers": "Customers",
+    "appointments": "Appointments",
+    "karute": "Karute",
+    "recording": "Recording",
+    "askAi": "Ask AI",
+    "settings": "Settings"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "loginButton": "Sign In",
+    "loginTitle": "Sign in to SYNQ Karute",
+    "loginSubtitle": "Enter your staff credentials to continue",
+    "profile": "Profile"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "todayAppointments": "Today's Appointments",
+    "recentKarute": "Recent Karute",
+    "quickActions": "Quick Actions",
+    "startRecording": "Start Recording",
+    "stats": {
+      "recordingsThisWeek": "Recordings This Week",
+      "customersServed": "Customers Served",
+      "karteGenerated": "Karute Generated"
+    }
+  },
+  "customers": {
+    "title": "Customers",
+    "addCustomer": "Add Customer",
+    "search": "Search customers...",
+    "name": "Name",
+    "nameKana": "Name (Kana)",
+    "phone": "Phone",
+    "email": "Email",
+    "tags": "Tags",
+    "notes": "Notes",
+    "karteHistory": "Karute History",
+    "noCustomers": "No customers registered",
+    "deleteConfirm": "Are you sure you want to delete this customer?"
+  },
+  "appointments": {
+    "title": "Appointments",
+    "addAppointment": "Add Appointment",
+    "today": "Today",
+    "week": "Week",
+    "customer": "Customer",
+    "staff": "Staff",
+    "time": "Time",
+    "status": "Status",
+    "serviceType": "Service Type",
+    "scheduled": "Scheduled",
+    "inProgress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "recording": {
+    "title": "Recording",
+    "start": "Start Recording",
+    "stop": "Stop Recording",
+    "pause": "Pause",
+    "resume": "Resume",
+    "recording": "Recording...",
+    "processing": "Processing...",
+    "selectCustomer": "Please select a customer",
+    "permissionRequired": "Microphone permission is required",
+    "elapsed": "Elapsed Time"
+  },
+  "karute": {
+    "title": "Karute",
+    "summary": "AI Summary",
+    "entries": "Entries",
+    "symptom": "Symptoms",
+    "treatment": "Treatment Notes",
+    "preference": "Preferences",
+    "lifestyle": "Lifestyle",
+    "nextAppointment": "Next Appointment",
+    "product": "Products",
+    "other": "Other",
+    "professional": "Professional",
+    "personal": "Personal",
+    "approve": "Approve",
+    "edit": "Edit",
+    "export": "Export",
+    "history": "Karute History",
+    "noEntries": "No entries",
+    "confidence": "Confidence",
+    "originalQuote": "Original Quote"
+  },
+  "askAi": {
+    "title": "Ask AI",
+    "placeholder": "Ask a question about your customers...",
+    "send": "Send",
+    "thinking": "Thinking...",
+    "examples": {
+      "title": "Example Questions",
+      "q1": "What has Tanaka-san said about scalp issues?",
+      "q2": "What are the treatment trends for last month?",
+      "q3": "What is Yamada-san's preferred style?"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "organization": "Organization",
+    "ai": "AI Settings",
+    "recording": "Recording Settings",
+    "staff": "Staff Management",
+    "language": "Language",
+    "theme": "Theme",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "close": "Close",
+    "noData": "No data available"
+  }
+}

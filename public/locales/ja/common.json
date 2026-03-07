@@ -1,0 +1,139 @@
+{
+  "app": {
+    "name": "SYNQ カルテ",
+    "tagline": "AI電子カルテシステム"
+  },
+  "nav": {
+    "dashboard": "ダッシュボード",
+    "customers": "顧客管理",
+    "appointments": "予約一覧",
+    "karute": "カルテ",
+    "recording": "録音",
+    "askAi": "AI に質問",
+    "settings": "設定"
+  },
+  "auth": {
+    "login": "ログイン",
+    "logout": "ログアウト",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "loginButton": "ログイン",
+    "loginTitle": "SYNQ カルテにログイン",
+    "loginSubtitle": "スタッフアカウントでログインしてください",
+    "profile": "プロフィール"
+  },
+  "dashboard": {
+    "title": "ダッシュボード",
+    "todayAppointments": "今日の予約",
+    "recentKarute": "最近のカルテ",
+    "quickActions": "クイックアクション",
+    "startRecording": "録音開始",
+    "stats": {
+      "recordingsThisWeek": "今週の録音数",
+      "customersServed": "対応顧客数",
+      "karteGenerated": "生成カルテ数"
+    }
+  },
+  "customers": {
+    "title": "顧客管理",
+    "addCustomer": "顧客を追加",
+    "search": "顧客を検索...",
+    "name": "氏名",
+    "nameKana": "フリガナ",
+    "phone": "電話番号",
+    "email": "メールアドレス",
+    "tags": "タグ",
+    "notes": "メモ",
+    "karteHistory": "カルテ履歴",
+    "noCustomers": "顧客が登録されていません",
+    "deleteConfirm": "この顧客を削除しますか？"
+  },
+  "appointments": {
+    "title": "予約一覧",
+    "addAppointment": "予約を追加",
+    "today": "今日",
+    "week": "週間",
+    "customer": "顧客",
+    "staff": "担当",
+    "time": "時間",
+    "status": "ステータス",
+    "serviceType": "施術内容",
+    "scheduled": "予約済み",
+    "inProgress": "施術中",
+    "completed": "完了",
+    "cancelled": "キャンセル"
+  },
+  "recording": {
+    "title": "録音",
+    "start": "録音開始",
+    "stop": "録音停止",
+    "pause": "一時停止",
+    "resume": "再開",
+    "recording": "録音中...",
+    "processing": "処理中...",
+    "selectCustomer": "顧客を選択してください",
+    "permissionRequired": "マイクの許可が必要です",
+    "elapsed": "経過時間"
+  },
+  "karute": {
+    "title": "カルテ",
+    "summary": "AI要約",
+    "entries": "エントリー",
+    "symptom": "症状・問診",
+    "treatment": "施術所見",
+    "preference": "施術希望",
+    "lifestyle": "生活・趣味・仕事",
+    "nextAppointment": "次回予約",
+    "product": "商品",
+    "other": "その他",
+    "professional": "職種関連",
+    "personal": "個人的な話題",
+    "approve": "承認",
+    "edit": "編集",
+    "export": "エクスポート",
+    "history": "カルテ履歴",
+    "noEntries": "エントリーがありません",
+    "confidence": "信頼度",
+    "originalQuote": "元の発言"
+  },
+  "askAi": {
+    "title": "AI に質問",
+    "placeholder": "顧客について質問してください...",
+    "send": "送信",
+    "thinking": "考え中...",
+    "examples": {
+      "title": "質問の例",
+      "q1": "田中さんの頭皮に関する過去の相談内容は？",
+      "q2": "先月来店した顧客の施術傾向は？",
+      "q3": "山田さんの好みのスタイルは？"
+    }
+  },
+  "settings": {
+    "title": "設定",
+    "organization": "組織設定",
+    "ai": "AI設定",
+    "recording": "録音設定",
+    "staff": "スタッフ管理",
+    "language": "言語",
+    "theme": "テーマ",
+    "darkMode": "ダークモード",
+    "lightMode": "ライトモード"
+  },
+  "common": {
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "add": "追加",
+    "search": "検索",
+    "filter": "フィルター",
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました",
+    "success": "成功しました",
+    "confirm": "確認",
+    "back": "戻る",
+    "next": "次へ",
+    "close": "閉じる",
+    "noData": "データがありません"
+  }
+}
