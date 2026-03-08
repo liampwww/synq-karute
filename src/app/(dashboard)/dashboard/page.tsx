@@ -439,9 +439,22 @@ export default function DashboardPage() {
       <motion.div variants={itemVariants}>
         <Card>
           <CardHeader className="border-b">
-            <CardTitle className="flex items-center gap-2">
-              AI推奨アクション
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                AI推奨アクション
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => router.push("/customers")}
+              >
+                <span>顧客一覧</span>
+                <ArrowRight className="size-3.5" />
+              </Button>
+            </div>
+            <CardDescription>
+              顧客のタイムライン・カルテデータからAIが推奨するアクション
+            </CardDescription>
           </CardHeader>
           <CardContent className="pt-4">
             <InsightCards

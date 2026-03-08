@@ -162,6 +162,9 @@ export interface Database {
           profile: Json | null;
           tags: string[];
           notes: string | null;
+          visit_count: number;
+          first_visit_at: string | null;
+          last_visit_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -175,6 +178,9 @@ export interface Database {
           profile?: Json | null;
           tags?: string[];
           notes?: string | null;
+          visit_count?: number;
+          first_visit_at?: string | null;
+          last_visit_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -188,6 +194,9 @@ export interface Database {
           profile?: Json | null;
           tags?: string[];
           notes?: string | null;
+          visit_count?: number;
+          first_visit_at?: string | null;
+          last_visit_at?: string | null;
           updated_at?: string;
         };
         Relationships: [

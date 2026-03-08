@@ -16,9 +16,10 @@ const ACCEPTED_TYPES = [
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   "application/vnd.ms-excel",
   "text/plain",
+  "application/json",
 ];
 
-const ACCEPTED_EXTENSIONS = [".csv", ".xlsx", ".xls", ".tsv"];
+const ACCEPTED_EXTENSIONS = [".csv", ".xlsx", ".xls", ".tsv", ".json"];
 
 export function FileUploader({ onFileSelected, isUploading }: FileUploaderProps) {
   const [dragActive, setDragActive] = useState(false);
@@ -106,7 +107,7 @@ export function FileUploader({ onFileSelected, isUploading }: FileUploaderProps)
           ファイルをドラッグ＆ドロップ
         </p>
         <p className="text-xs text-muted-foreground">
-          CSV, Excel (.xlsx) に対応
+          CSV, Excel (.xlsx), JSON に対応
         </p>
       </div>
       <label>
@@ -116,7 +117,7 @@ export function FileUploader({ onFileSelected, isUploading }: FileUploaderProps)
         <input
           type="file"
           className="sr-only"
-          accept=".csv,.xlsx,.xls,.tsv"
+          accept=".csv,.xlsx,.xls,.tsv,.json"
           onChange={handleInputChange}
         />
       </label>

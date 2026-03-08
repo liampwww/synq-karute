@@ -141,6 +141,59 @@ export function MappingEditor({
         </CardContent>
       </Card>
 
+      {sampleRows.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">サンプルデータプレビュー</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              最初の{Math.min(sampleRows.length, 5)}行のデータ（マッピング確認用）
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto rounded-lg border">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b bg-muted/50">
+                    {mappings.slice(0, 8).map((m) => (
+                      <th
+                        key={m.sourceField}
+                        className="px-3 py-2 text-left font-medium text-muted-foreground whitespace-nowrap"
+                      >
+                        <div>{m.sourceField}</div>
+                        {m.targetField && (
+                          <div className="text-[10px] font-normal text-primary">
+                            → {m.targetField}
+                          </div>
+                        )}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {sampleRows.slice(0, 5).map((row, rowIdx) => (
+                    <tr key={rowIdx} className="border-b last:border-0">
+                      {mappings.slice(0, 8).map((m) => (
+                        <td
+                          key={m.sourceField}
+                          className="px-3 py-1.5 text-muted-foreground whitespace-nowrap max-w-[180px] truncate"
+                        >
+                          {row[m.sourceField] != null ? String(row[m.sourceField]) : "—"}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {mappings.length > 8 && (
+              <p className="text-[10px] text-muted-foreground mt-1">
+                +{mappings.length - 8} 列（テーブルには最初の8列のみ表示）
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle className="text-base">重複処理</CardTitle>

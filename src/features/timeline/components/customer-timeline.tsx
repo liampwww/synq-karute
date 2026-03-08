@@ -1,11 +1,21 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Filter, Plus, RefreshCw, Sparkles, Loader2 } from "lucide-react";
+import { differenceInDays } from "date-fns";
+import {
+  Filter,
+  Plus,
+  RefreshCw,
+  Sparkles,
+  Loader2,
+  AlertTriangle,
+  BarChart3,
+} from "lucide-react";
 
 import type { Tables, TimelineEventType } from "@/types/database";
 import { useAuthStore } from "@/stores/auth-store";
+import { createClient } from "@/lib/supabase/client";
 import {
   getCustomerTimeline,
   type TimelineQueryOptions,
@@ -24,13 +34,37 @@ const EVENT_TYPE_FILTERS: {
   { value: "treatment", label: "施術" },
   { value: "note", label: "メモ" },
   { value: "photo", label: "写真" },
+  { value: "form", label: "フォーム" },
   { value: "contact", label: "連絡" },
   { value: "import", label: "インポート" },
+  { value: "milestone", label: "マイルストーン" },
 ];
 
 interface CustomerTimelineProps {
   customerId: string;
   onNavigateToKarute?: (karuteId: string) => void;
+}
+
+function computeGapDays(events: Tables<"timeline_events">[]) {
+  const gaps: Map<string, number> = new Map();
+  const visitTypes = new Set<TimelineEventType>(["visit", "treatment"]);
+  const sorted = [...events].sort(
+    (a, b) => new Date(b.event_date).getTime() - new Date(a.event_date).getTime()
+  );
+
+  let prevVisitDate: Date | null = null;
+  for (const ev of sorted) {
+    if (visitTypes.has(ev.event_type as TimelineEventType)) {
+      if (prevVisitDate) {
+        const gap = differenceInDays(prevVisitDate, new Date(ev.event_date));
+        if (gap > 30) {
+          gaps.set(ev.id, gap);
+        }
+      }
+      prevVisitDate = new Date(ev.event_date);
+    }
+  }
+  return gaps;
 }
 
 export function CustomerTimeline({
@@ -50,7 +84,7 @@ export function CustomerTimeline({
     if (!organization) return;
     setIsLoading(true);
     try {
-      const options: TimelineQueryOptions = { limit: 100 };
+      const options: TimelineQueryOptions = { limit: 200 };
       if (activeFilters.length > 0) {
         options.eventTypes = activeFilters;
       }
@@ -66,6 +100,42 @@ export function CustomerTimeline({
   useEffect(() => {
     fetchTimeline();
   }, [fetchTimeline]);
+
+  useEffect(() => {
+    async function loadPersistedSummary() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from("customers")
+          .select("profile")
+          .eq("id", customerId)
+          .single();
+        const profile = data?.profile as Record<string, unknown> | null;
+        if (profile?.ai_summary && typeof profile.ai_summary === "string") {
+          setAiSummary(profile.ai_summary);
+        }
+      } catch {
+        // silent
+      }
+    }
+    loadPersistedSummary();
+  }, [customerId]);
+
+  const gapMap = useMemo(() => computeGapDays(events), [events]);
+
+  const timelineStats = useMemo(() => {
+    if (events.length === 0) return null;
+    const visitEvents = events.filter(
+      (e) => e.event_type === "visit" || e.event_type === "treatment"
+    );
+    const totalVisits = visitEvents.length;
+    const firstEvent = events[events.length - 1];
+    const lastVisit = visitEvents[0];
+    const daysSinceLastVisit = lastVisit
+      ? differenceInDays(new Date(), new Date(lastVisit.event_date))
+      : null;
+    return { totalVisits, firstEvent, lastVisit, daysSinceLastVisit };
+  }, [events]);
 
   const toggleFilter = (eventType: TimelineEventType) => {
     setActiveFilters((prev) =>
@@ -87,9 +157,9 @@ export function CustomerTimeline({
           businessType: organization.type || "hair",
         }),
       });
-      const data = await res.json();
-      if (data.summary) {
-        setAiSummary(data.summary);
+      const json = await res.json();
+      if (json.summary) {
+        setAiSummary(json.summary);
         toast.success("AIサマリーを生成しました");
       } else {
         toast.info("サマリー生成に十分なデータがありません");
@@ -114,6 +184,45 @@ export function CustomerTimeline({
 
   return (
     <div className="space-y-4">
+      {timelineStats && timelineStats.totalVisits > 0 && (
+        <div className="grid grid-cols-3 gap-3">
+          <div className="rounded-lg border bg-card p-3 text-center">
+            <p className="text-2xl font-bold tabular-nums">{timelineStats.totalVisits}</p>
+            <p className="text-[11px] text-muted-foreground">来店回数</p>
+          </div>
+          <div className="rounded-lg border bg-card p-3 text-center">
+            <p className="text-2xl font-bold tabular-nums">{events.length}</p>
+            <p className="text-[11px] text-muted-foreground">記録件数</p>
+          </div>
+          <div className="rounded-lg border bg-card p-3 text-center">
+            {timelineStats.daysSinceLastVisit != null ? (
+              <>
+                <p className={`text-2xl font-bold tabular-nums ${timelineStats.daysSinceLastVisit > 60 ? "text-orange-500" : timelineStats.daysSinceLastVisit > 90 ? "text-red-500" : ""}`}>
+                  {timelineStats.daysSinceLastVisit}
+                </p>
+                <p className="text-[11px] text-muted-foreground">最終来店からの日数</p>
+              </>
+            ) : (
+              <>
+                <p className="text-2xl font-bold">-</p>
+                <p className="text-[11px] text-muted-foreground">最終来店からの日数</p>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {timelineStats?.daysSinceLastVisit != null && timelineStats.daysSinceLastVisit > 60 && (
+        <div className="flex items-center gap-2 rounded-lg border border-orange-500/30 bg-orange-500/5 px-4 py-2.5">
+          <AlertTriangle className="size-4 text-orange-500 shrink-0" />
+          <p className="text-sm text-orange-700 dark:text-orange-400">
+            {timelineStats.daysSinceLastVisit > 90
+              ? `${timelineStats.daysSinceLastVisit}日間来店がありません。再来促進のアクションを検討してください。`
+              : `前回の来店から${timelineStats.daysSinceLastVisit}日経過しています。フォローアップをおすすめします。`}
+          </p>
+        </div>
+      )}
+
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Filter className="size-4 text-muted-foreground" />
@@ -157,7 +266,7 @@ export function CustomerTimeline({
                   <div className="flex items-center gap-1.5">
                     <Sparkles className="size-3.5 text-amber-500" />
                     <span className="text-xs font-medium text-amber-700 dark:text-amber-400">
-                      AIサマリー
+                      AIカスタマーサマリー
                     </span>
                   </div>
                   <Button
@@ -236,7 +345,11 @@ export function CustomerTimeline({
         </div>
       ) : events.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-2 py-12 text-muted-foreground">
+          <BarChart3 className="size-8 opacity-30" />
           <p className="text-sm">タイムラインイベントがありません</p>
+          <p className="text-xs text-muted-foreground/70">
+            録音・施術記録・手動入力・インポートからイベントが追加されます
+          </p>
           <Button
             variant="outline"
             size="sm"
@@ -253,6 +366,7 @@ export function CustomerTimeline({
               key={event.id}
               event={event}
               onClickDetail={handleEventClick}
+              gapDays={gapMap.get(event.id) ?? null}
             />
           ))}
         </div>

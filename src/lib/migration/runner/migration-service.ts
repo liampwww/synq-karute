@@ -9,6 +9,7 @@ import type {
 } from "../types";
 import { CsvParserConnector } from "../connectors/csv-parser";
 import { ExcelParserConnector } from "../connectors/excel-parser";
+import { JsonParserConnector } from "../connectors/json-parser";
 import { batchWriteRecords } from "./batch-writer";
 
 function getConnector(fileName: string) {
@@ -20,6 +21,8 @@ function getConnector(fileName: string) {
     case "xlsx":
     case "xls":
       return new ExcelParserConnector();
+    case "json":
+      return new JsonParserConnector();
     default:
       return new CsvParserConnector();
   }

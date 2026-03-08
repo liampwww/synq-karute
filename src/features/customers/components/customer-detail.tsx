@@ -3,17 +3,22 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, type Variants } from "framer-motion";
+import { format, differenceInDays } from "date-fns";
 import {
   ArrowLeft,
+  Calendar,
   Clock,
   FileText,
   Mail,
   Pencil,
   Phone,
   Trash2,
+  Camera,
+  AlertTriangle,
+  Activity,
+  User,
 } from "lucide-react";
 import { toast } from "sonner";
-import { format } from "date-fns";
 
 import type { Tables } from "@/types/database";
 import { useI18n } from "@/lib/i18n/context";
@@ -39,6 +44,7 @@ import {
 import { CustomerForm } from "./customer-form";
 import { CustomerTimeline } from "@/features/timeline/components/customer-timeline";
 import { InsightCards } from "@/features/insights/components/insight-cards";
+import { PhotoGallery } from "@/features/photos/components/photo-gallery";
 
 type KaruteRecord = Tables<"karute_records">;
 type KaruteEntry = Tables<"karute_entries">;
@@ -71,6 +77,7 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [karutes, setKarutes] = useState<KaruteWithEntries[]>([]);
   const [karutesLoading, setKarutesLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("timeline");
 
   const fetchCustomer = useCallback(async () => {
     try {
@@ -199,6 +206,13 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
     );
   }
 
+  const daysSinceLastVisit = customer.last_visit_at
+    ? differenceInDays(new Date(), new Date(customer.last_visit_at))
+    : null;
+
+  const profile = customer.profile as Record<string, unknown> | null;
+  const hasAiSummary = !!(profile?.ai_summary && typeof profile.ai_summary === "string");
+
   return (
     <motion.div
       variants={fadeIn}
@@ -233,39 +247,43 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
       </div>
 
       <Card>
-        <CardHeader>
-          <div className="space-y-1">
-            <CardTitle className="text-xl">{customer.name}</CardTitle>
-            {customer.name_kana && (
-              <p className="text-sm text-muted-foreground">
-                {customer.name_kana}
-              </p>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {(customer.phone || customer.email) && (
-            <div className="flex flex-wrap gap-4">
-              {customer.phone && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Phone className="size-4" />
-                  <span>{customer.phone}</span>
-                </div>
-              )}
-              {customer.email && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Mail className="size-4" />
-                  <span>{customer.email}</span>
-                </div>
-              )}
+        <CardContent className="pt-6">
+          <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+            <div className="flex size-14 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-xl">
+              {customer.name.charAt(0)}
             </div>
-          )}
+            <div className="flex-1 space-y-3">
+              <div>
+                <h2 className="text-xl font-bold">{customer.name}</h2>
+                {customer.name_kana && (
+                  <p className="text-sm text-muted-foreground">
+                    {customer.name_kana}
+                  </p>
+                )}
+              </div>
 
-          {customer.tags.length > 0 && (
-            <>
-              <Separator />
-              <div className="space-y-2">
-                <p className="text-sm font-medium">{t("customers.tags")}</p>
+              <div className="flex flex-wrap gap-4">
+                {customer.phone && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Phone className="size-4" />
+                    <span>{customer.phone}</span>
+                  </div>
+                )}
+                {customer.email && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Mail className="size-4" />
+                    <span>{customer.email}</span>
+                  </div>
+                )}
+                {customer.first_visit_at && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Calendar className="size-4" />
+                    <span>初回: {format(new Date(customer.first_visit_at), "yyyy/MM/dd")}</span>
+                  </div>
+                )}
+              </div>
+
+              {customer.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                   {customer.tags.map((tag) => (
                     <Badge key={tag} variant="secondary">
@@ -273,15 +291,34 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
                     </Badge>
                   ))}
                 </div>
-              </div>
-            </>
-          )}
+              )}
+            </div>
+
+            <div className="flex flex-wrap sm:flex-col gap-2 shrink-0">
+              {customer.visit_count > 0 && (
+                <div className="rounded-lg border bg-card px-3 py-2 text-center min-w-[80px]">
+                  <p className="text-lg font-bold tabular-nums">{customer.visit_count}</p>
+                  <p className="text-[10px] text-muted-foreground">来店</p>
+                </div>
+              )}
+              {daysSinceLastVisit != null && (
+                <div className={`rounded-lg border px-3 py-2 text-center min-w-[80px] ${daysSinceLastVisit > 90 ? "border-red-500/30 bg-red-500/5" : daysSinceLastVisit > 60 ? "border-orange-500/30 bg-orange-500/5" : "bg-card"}`}>
+                  <p className={`text-lg font-bold tabular-nums ${daysSinceLastVisit > 90 ? "text-red-500" : daysSinceLastVisit > 60 ? "text-orange-500" : ""}`}>
+                    {daysSinceLastVisit}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground">日前</p>
+                </div>
+              )}
+            </div>
+          </div>
 
           {customer.notes && (
             <>
-              <Separator />
-              <div className="space-y-2">
-                <p className="text-sm font-medium">{t("customers.notes")}</p>
+              <Separator className="my-4" />
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  メモ
+                </p>
                 <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                   {customer.notes}
                 </p>
@@ -291,21 +328,43 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
         </CardContent>
       </Card>
 
+      {daysSinceLastVisit != null && daysSinceLastVisit > 90 && (
+        <div className="flex items-center gap-3 rounded-xl border border-red-500/30 bg-red-500/5 px-4 py-3">
+          <AlertTriangle className="size-5 text-red-500 shrink-0" />
+          <div>
+            <p className="text-sm font-medium text-red-700 dark:text-red-400">
+              離脱リスク: {daysSinceLastVisit}日間来店がありません
+            </p>
+            <p className="text-xs text-red-600/80 dark:text-red-400/70 mt-0.5">
+              再来店促進のフォローアップを検討してください
+            </p>
+          </div>
+        </div>
+      )}
+
       <Card>
         <CardContent className="pt-6">
           <InsightCards customerId={customerId} />
         </CardContent>
       </Card>
 
-      <Tabs defaultValue="timeline" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="timeline" className="flex items-center gap-1.5">
-            <Clock className="size-3.5" />
+            <Activity className="size-3.5" />
             タイムライン
           </TabsTrigger>
           <TabsTrigger value="karute" className="flex items-center gap-1.5">
             <FileText className="size-3.5" />
-            {t("customers.karteHistory")}
+            カルテ
+          </TabsTrigger>
+          <TabsTrigger value="photos" className="flex items-center gap-1.5">
+            <Camera className="size-3.5" />
+            写真
+          </TabsTrigger>
+          <TabsTrigger value="profile" className="flex items-center gap-1.5">
+            <User className="size-3.5" />
+            詳細
           </TabsTrigger>
         </TabsList>
 
@@ -344,6 +403,9 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
                 <div className="flex flex-col items-center justify-center gap-2 py-8 text-muted-foreground">
                   <FileText className="size-8 opacity-40" />
                   <p className="text-sm">{t("common.noData")}</p>
+                  <p className="text-xs text-muted-foreground/70">
+                    録音を開始するとAIが自動的にカルテを生成します
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -468,6 +530,73 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
                     );
                   })}
                 </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="photos" className="mt-4">
+          <Card>
+            <CardContent className="pt-6">
+              <PhotoGallery customerId={customerId} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="profile" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="size-4" />
+                顧客詳細情報
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">登録日</p>
+                  <p className="text-sm">{format(new Date(customer.created_at), "yyyy/MM/dd")}</p>
+                </div>
+                {customer.first_visit_at && (
+                  <div className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">初回来店</p>
+                    <p className="text-sm">{format(new Date(customer.first_visit_at), "yyyy/MM/dd")}</p>
+                  </div>
+                )}
+                {customer.last_visit_at && (
+                  <div className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">最終来店</p>
+                    <p className="text-sm">{format(new Date(customer.last_visit_at), "yyyy/MM/dd")}</p>
+                  </div>
+                )}
+                <div className="space-y-1">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">累計来店回数</p>
+                  <p className="text-sm">{customer.visit_count ?? 0}回</p>
+                </div>
+              </div>
+
+              {hasAiSummary && (
+                <>
+                  <Separator />
+                  <div className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">AIサマリー</p>
+                    <p className="text-sm text-muted-foreground whitespace-pre-line leading-relaxed">
+                      {profile!.ai_summary as string}
+                    </p>
+                  </div>
+                </>
+              )}
+
+              {customer.notes && (
+                <>
+                  <Separator />
+                  <div className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">スタッフメモ</p>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                      {customer.notes}
+                    </p>
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
