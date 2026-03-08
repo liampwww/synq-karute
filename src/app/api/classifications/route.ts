@@ -110,6 +110,25 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    await supabase.from("timeline_events").insert({
+      customer_id: rec.customer_id,
+      org_id: rec.org_id,
+      staff_id: rec.staff_id,
+      event_type: "treatment" as const,
+      source: "recording",
+      source_ref: `recording:${recordingId}`,
+      title: classification.summary?.slice(0, 80) || "施術記録",
+      description: classification.summary || null,
+      structured_data: {
+        business_type: businessType ?? "hair",
+        entry_count: classification.entries.length,
+        recording_id: recordingId,
+      },
+      event_date: new Date().toISOString(),
+      linked_record_id: kr.id,
+      linked_record_type: "karute",
+    });
+
     return NextResponse.json({
       karuteId: kr.id,
       summary: classification.summary,

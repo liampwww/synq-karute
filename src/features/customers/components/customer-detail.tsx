@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, type Variants } from "framer-motion";
 import {
   ArrowLeft,
+  Clock,
   FileText,
   Mail,
   Pencil,
@@ -28,6 +29,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -35,6 +37,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { CustomerForm } from "./customer-form";
+import { CustomerTimeline } from "@/features/timeline/components/customer-timeline";
+import { InsightCards } from "@/features/insights/components/insight-cards";
 
 type KaruteRecord = Tables<"karute_records">;
 type KaruteEntry = Tables<"karute_entries">;
@@ -288,148 +292,187 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="size-4" />
-            {t("customers.karteHistory")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {karutesLoading ? (
-            <div className="space-y-3">
-              {[1, 2].map((i) => (
-                <div
-                  key={i}
-                  className="h-32 animate-pulse rounded-lg bg-muted/50"
-                />
-              ))}
-            </div>
-          ) : karutes.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-2 py-8 text-muted-foreground">
-              <FileText className="size-8 opacity-40" />
-              <p className="text-sm">{t("common.noData")}</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {karutes.map((karute) => {
-                const biz = getBusinessType(karute.business_type);
-                const proEntries = karute.entries.filter(
-                  (e) => e.category === "professional"
-                );
-                const personalEntries = karute.entries.filter(
-                  (e) => e.category === "personal"
-                );
-
-                return (
-                  <Card key={karute.id} className="border-border/60">
-                    <CardContent className="space-y-3 pt-4">
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium">
-                            {format(
-                              new Date(karute.created_at),
-                              "yyyy/MM/dd HH:mm"
-                            )}
-                          </span>
-                          <Badge variant="secondary" className="text-xs">
-                            {biz.icon} {biz.label}
-                          </Badge>
-                        </div>
-                        <Badge
-                          variant={
-                            karute.status === "approved"
-                              ? "default"
-                              : karute.status === "review"
-                                ? "secondary"
-                                : "outline"
-                          }
-                          className="text-xs"
-                        >
-                          {karute.status === "approved"
-                            ? "承認済"
-                            : karute.status === "review"
-                              ? "レビュー中"
-                              : "下書き"}
-                        </Badge>
-                      </div>
-
-                      {karute.ai_summary && (
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {karute.ai_summary}
-                        </p>
-                      )}
-
-                      {proEntries.length > 0 && (
-                        <div className="space-y-1.5">
-                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                            職種関連
-                          </p>
-                          <ul className="space-y-1 pl-1">
-                            {proEntries.map((entry) => (
-                              <li
-                                key={entry.id}
-                                className="flex items-start gap-2 text-sm"
-                              >
-                                <span className="mt-1.5 size-1 shrink-0 rounded-full bg-foreground/40" />
-                                <span>
-                                  {entry.subcategory && (
-                                    <span className="font-medium text-foreground/70">
-                                      {entry.subcategory}:{" "}
-                                    </span>
-                                  )}
-                                  {entry.content}
-                                </span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      {personalEntries.length > 0 && (
-                        <div className="space-y-1.5">
-                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                            個人的な話題
-                          </p>
-                          <ul className="space-y-1 pl-1">
-                            {personalEntries.map((entry) => (
-                              <li
-                                key={entry.id}
-                                className="flex items-start gap-2 text-sm"
-                              >
-                                <span className="mt-1.5 size-1 shrink-0 rounded-full bg-foreground/40" />
-                                <span>
-                                  {entry.subcategory && (
-                                    <span className="font-medium text-foreground/70">
-                                      {entry.subcategory}:{" "}
-                                    </span>
-                                  )}
-                                  {entry.content}
-                                </span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      <div className="pt-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 text-xs"
-                          onClick={() => router.push(`/karute/${karute.id}`)}
-                        >
-                          <FileText className="size-3" data-icon="inline-start" />
-                          詳細を見る
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          )}
+        <CardContent className="pt-6">
+          <InsightCards customerId={customerId} />
         </CardContent>
       </Card>
+
+      <Tabs defaultValue="timeline" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="timeline" className="flex items-center gap-1.5">
+            <Clock className="size-3.5" />
+            タイムライン
+          </TabsTrigger>
+          <TabsTrigger value="karute" className="flex items-center gap-1.5">
+            <FileText className="size-3.5" />
+            {t("customers.karteHistory")}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="timeline" className="mt-4">
+          <Card>
+            <CardContent className="pt-6">
+              <CustomerTimeline
+                customerId={customerId}
+                onNavigateToKarute={(karuteId) =>
+                  router.push(`/karute/${karuteId}`)
+                }
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="karute" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="size-4" />
+                {t("customers.karteHistory")}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {karutesLoading ? (
+                <div className="space-y-3">
+                  {[1, 2].map((i) => (
+                    <div
+                      key={i}
+                      className="h-32 animate-pulse rounded-lg bg-muted/50"
+                    />
+                  ))}
+                </div>
+              ) : karutes.length === 0 ? (
+                <div className="flex flex-col items-center justify-center gap-2 py-8 text-muted-foreground">
+                  <FileText className="size-8 opacity-40" />
+                  <p className="text-sm">{t("common.noData")}</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {karutes.map((karute) => {
+                    const biz = getBusinessType(karute.business_type);
+                    const proEntries = karute.entries.filter(
+                      (e) => e.category === "professional"
+                    );
+                    const personalEntries = karute.entries.filter(
+                      (e) => e.category === "personal"
+                    );
+
+                    return (
+                      <Card key={karute.id} className="border-border/60">
+                        <CardContent className="space-y-3 pt-4">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium">
+                                {format(
+                                  new Date(karute.created_at),
+                                  "yyyy/MM/dd HH:mm"
+                                )}
+                              </span>
+                              <Badge variant="secondary" className="text-xs">
+                                {biz.icon} {biz.label}
+                              </Badge>
+                            </div>
+                            <Badge
+                              variant={
+                                karute.status === "approved"
+                                  ? "default"
+                                  : karute.status === "review"
+                                    ? "secondary"
+                                    : "outline"
+                              }
+                              className="text-xs"
+                            >
+                              {karute.status === "approved"
+                                ? "承認済"
+                                : karute.status === "review"
+                                  ? "レビュー中"
+                                  : "下書き"}
+                            </Badge>
+                          </div>
+
+                          {karute.ai_summary && (
+                            <p className="text-sm text-muted-foreground leading-relaxed">
+                              {karute.ai_summary}
+                            </p>
+                          )}
+
+                          {proEntries.length > 0 && (
+                            <div className="space-y-1.5">
+                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                職種関連
+                              </p>
+                              <ul className="space-y-1 pl-1">
+                                {proEntries.map((entry) => (
+                                  <li
+                                    key={entry.id}
+                                    className="flex items-start gap-2 text-sm"
+                                  >
+                                    <span className="mt-1.5 size-1 shrink-0 rounded-full bg-foreground/40" />
+                                    <span>
+                                      {entry.subcategory && (
+                                        <span className="font-medium text-foreground/70">
+                                          {entry.subcategory}:{" "}
+                                        </span>
+                                      )}
+                                      {entry.content}
+                                    </span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {personalEntries.length > 0 && (
+                            <div className="space-y-1.5">
+                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                個人的な話題
+                              </p>
+                              <ul className="space-y-1 pl-1">
+                                {personalEntries.map((entry) => (
+                                  <li
+                                    key={entry.id}
+                                    className="flex items-start gap-2 text-sm"
+                                  >
+                                    <span className="mt-1.5 size-1 shrink-0 rounded-full bg-foreground/40" />
+                                    <span>
+                                      {entry.subcategory && (
+                                        <span className="font-medium text-foreground/70">
+                                          {entry.subcategory}:{" "}
+                                        </span>
+                                      )}
+                                      {entry.content}
+                                    </span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          <div className="pt-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 text-xs"
+                              onClick={() =>
+                                router.push(`/karute/${karute.id}`)
+                              }
+                            >
+                              <FileText
+                                className="size-3"
+                                data-icon="inline-start"
+                              />
+                              詳細を見る
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="sm:max-w-lg">

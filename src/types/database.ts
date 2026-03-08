@@ -34,6 +34,51 @@ export type KarteStatus = "draft" | "review" | "approved";
 
 export type StaffRole = "owner" | "admin" | "stylist" | "assistant";
 
+export type TimelineEventType =
+  | "visit"
+  | "treatment"
+  | "note"
+  | "photo"
+  | "form"
+  | "contact"
+  | "import"
+  | "milestone"
+  | "status_change";
+
+export type InsightType =
+  | "next_treatment"
+  | "follow_up"
+  | "reactivation"
+  | "churn_risk"
+  | "unresolved_issue"
+  | "talking_point"
+  | "upsell"
+  | "photo_request"
+  | "plan_incomplete"
+  | "high_value"
+  | "general";
+
+export type InsightStatus = "active" | "dismissed" | "actioned" | "expired";
+
+export type PhotoType = "before" | "after" | "progress" | "general" | "form";
+
+export type MigrationJobStatus =
+  | "pending"
+  | "analyzing"
+  | "mapping"
+  | "importing"
+  | "completed"
+  | "failed"
+  | "cancelled"
+  | "rolling_back";
+
+export type MigrationRecordStatus =
+  | "pending"
+  | "imported"
+  | "failed"
+  | "skipped"
+  | "duplicate";
+
 export interface Database {
   public: {
     Tables: {
@@ -430,6 +475,281 @@ export interface Database {
           }
         ];
       };
+      timeline_events: {
+        Row: {
+          id: string;
+          customer_id: string;
+          org_id: string;
+          staff_id: string | null;
+          event_type: TimelineEventType;
+          source: string;
+          source_ref: string | null;
+          title: string;
+          description: string | null;
+          structured_data: Json | null;
+          event_date: string;
+          linked_record_id: string | null;
+          linked_record_type: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          customer_id: string;
+          org_id: string;
+          staff_id?: string | null;
+          event_type: TimelineEventType;
+          source?: string;
+          source_ref?: string | null;
+          title: string;
+          description?: string | null;
+          structured_data?: Json | null;
+          event_date: string;
+          linked_record_id?: string | null;
+          linked_record_type?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          customer_id?: string;
+          org_id?: string;
+          staff_id?: string | null;
+          event_type?: TimelineEventType;
+          source?: string;
+          source_ref?: string | null;
+          title?: string;
+          description?: string | null;
+          structured_data?: Json | null;
+          event_date?: string;
+          linked_record_id?: string | null;
+          linked_record_type?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "timeline_events_customer_id_fkey";
+            columns: ["customer_id"];
+            isOneToOne: false;
+            referencedRelation: "customers";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "timeline_events_org_id_fkey";
+            columns: ["org_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      customer_photos: {
+        Row: {
+          id: string;
+          customer_id: string;
+          org_id: string;
+          timeline_event_id: string | null;
+          storage_path: string;
+          caption: string | null;
+          photo_type: PhotoType;
+          metadata: Json | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          customer_id: string;
+          org_id: string;
+          timeline_event_id?: string | null;
+          storage_path: string;
+          caption?: string | null;
+          photo_type?: PhotoType;
+          metadata?: Json | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          customer_id?: string;
+          org_id?: string;
+          timeline_event_id?: string | null;
+          storage_path?: string;
+          caption?: string | null;
+          photo_type?: PhotoType;
+          metadata?: Json | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "customer_photos_customer_id_fkey";
+            columns: ["customer_id"];
+            isOneToOne: false;
+            referencedRelation: "customers";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      customer_ai_insights: {
+        Row: {
+          id: string;
+          customer_id: string;
+          org_id: string;
+          insight_type: InsightType;
+          title: string;
+          description: string;
+          action_data: Json | null;
+          priority_score: number;
+          status: InsightStatus;
+          generated_at: string;
+          expires_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          customer_id: string;
+          org_id: string;
+          insight_type: InsightType;
+          title: string;
+          description: string;
+          action_data?: Json | null;
+          priority_score?: number;
+          status?: InsightStatus;
+          generated_at?: string;
+          expires_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          customer_id?: string;
+          org_id?: string;
+          insight_type?: InsightType;
+          title?: string;
+          description?: string;
+          action_data?: Json | null;
+          priority_score?: number;
+          status?: InsightStatus;
+          expires_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "customer_ai_insights_customer_id_fkey";
+            columns: ["customer_id"];
+            isOneToOne: false;
+            referencedRelation: "customers";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      migration_jobs: {
+        Row: {
+          id: string;
+          org_id: string;
+          staff_id: string;
+          source_type: string;
+          source_name: string | null;
+          status: MigrationJobStatus;
+          total_records: number;
+          imported_records: number;
+          failed_records: number;
+          skipped_records: number;
+          field_mapping: Json | null;
+          error_log: Json | null;
+          uploaded_file_path: string | null;
+          metadata: Json | null;
+          started_at: string | null;
+          completed_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          org_id: string;
+          staff_id: string;
+          source_type: string;
+          source_name?: string | null;
+          status?: MigrationJobStatus;
+          total_records?: number;
+          imported_records?: number;
+          failed_records?: number;
+          skipped_records?: number;
+          field_mapping?: Json | null;
+          error_log?: Json | null;
+          uploaded_file_path?: string | null;
+          metadata?: Json | null;
+          started_at?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          org_id?: string;
+          staff_id?: string;
+          source_type?: string;
+          source_name?: string | null;
+          status?: MigrationJobStatus;
+          total_records?: number;
+          imported_records?: number;
+          failed_records?: number;
+          skipped_records?: number;
+          field_mapping?: Json | null;
+          error_log?: Json | null;
+          uploaded_file_path?: string | null;
+          metadata?: Json | null;
+          started_at?: string | null;
+          completed_at?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "migration_jobs_org_id_fkey";
+            columns: ["org_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      migration_records: {
+        Row: {
+          id: string;
+          job_id: string;
+          source_row_index: number | null;
+          target_table: string;
+          target_id: string | null;
+          status: MigrationRecordStatus;
+          source_data: Json | null;
+          error_message: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          job_id: string;
+          source_row_index?: number | null;
+          target_table: string;
+          target_id?: string | null;
+          status?: MigrationRecordStatus;
+          source_data?: Json | null;
+          error_message?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          job_id?: string;
+          source_row_index?: number | null;
+          target_table?: string;
+          target_id?: string | null;
+          status?: MigrationRecordStatus;
+          source_data?: Json | null;
+          error_message?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "migration_records_job_id_fkey";
+            columns: ["job_id"];
+            isOneToOne: false;
+            referencedRelation: "migration_jobs";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -439,6 +759,12 @@ export interface Database {
       karte_status: KarteStatus;
       karte_category: KarteCategory;
       staff_role: StaffRole;
+      timeline_event_type: TimelineEventType;
+      insight_type: InsightType;
+      insight_status: InsightStatus;
+      photo_type: PhotoType;
+      migration_job_status: MigrationJobStatus;
+      migration_record_status: MigrationRecordStatus;
     };
     CompositeTypes: Record<string, never>;
   };

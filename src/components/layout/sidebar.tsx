@@ -11,6 +11,7 @@ import {
   FileText,
   Mic,
   MessageSquare,
+  Database,
   Settings,
   ChevronsLeft,
   ChevronsRight,
@@ -37,6 +38,7 @@ export const NAV_ITEMS = [
   { key: "karute", href: "/karute", icon: FileText },
   { key: "recording", href: "/recording", icon: Mic },
   { key: "askAi", href: "/ask-ai", icon: MessageSquare },
+  { key: "migration", href: "/migration", icon: Database },
   { key: "settings", href: "/settings", icon: Settings },
 ] as const;
 

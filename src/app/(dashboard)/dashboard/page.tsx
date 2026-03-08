@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { InsightCards } from "@/features/insights/components/insight-cards";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -434,6 +435,23 @@ export default function DashboardPage() {
           </Card>
         </motion.div>
       </div>
+
+      <motion.div variants={itemVariants}>
+        <Card>
+          <CardHeader className="border-b">
+            <CardTitle className="flex items-center gap-2">
+              AI推奨アクション
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <InsightCards
+              showCustomerName
+              limit={5}
+              onNavigateToCustomer={(id) => router.push(`/customers/${id}`)}
+            />
+          </CardContent>
+        </Card>
+      </motion.div>
 
       <motion.div variants={itemVariants}>
         <Card>
