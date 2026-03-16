@@ -66,10 +66,19 @@
     "scheduled": "予約済み",
     "inProgress": "施術中",
     "completed": "完了",
-    "cancelled": "キャンセル"
+    "cancelled": "キャンセル",
+    "startRecording": "録音開始",
+    "markInProgress": "施術中にする",
+    "markCompleted": "完了にする"
   },
   "recording": {
     "title": "録音",
+    "subtitle": "お客様を選択して録音を開始します",
+    "noAppointmentsToday": "本日の予約はありません",
+    "noAppointmentsHint": "予約が入ると、ここに表示されます",
+    "currentAppointment": "現在の予約",
+    "nextAppointmentLabel": "次の予約",
+    "loadFailed": "予約の読み込みに失敗しました",
     "start": "録音開始",
     "stop": "録音停止",
     "pause": "一時停止",
@@ -78,7 +87,20 @@
     "processing": "処理中...",
     "selectCustomer": "顧客を選択してください",
     "permissionRequired": "マイクの許可が必要です",
-    "elapsed": "経過時間"
+    "elapsed": "経過時間",
+    "tapToStart": "タップして録音開始",
+    "paused": "一時停止中",
+    "customer": "お客様",
+    "browserNotSupported": "このブラウザは録音に対応していません",
+    "recordingError": "録音エラー",
+    "startFailed": "録音を開始できませんでした",
+    "saved": "録音を保存しました",
+    "storageNotConfigured": "録音用のストレージが設定されていません。SupabaseのSQLを実行してください。",
+    "saveFailed": "録音の保存に失敗しました",
+    "notSupported": "録音非対応",
+    "notSupportedHint": "このブラウザは録音機能に対応していません。Safari または Chrome",
+    "saving": "録音を保存中...",
+    "staffNotFound": "スタッフ情報が見つかりません"
   },
   "karute": {
     "title": "カルテ",
@@ -113,7 +135,12 @@
     "history": "カルテ履歴",
     "noEntries": "エントリーがありません",
     "confidence": "信頼度",
-    "originalQuote": "元の発言"
+    "originalQuote": "元の発言",
+    "categoriesView": "カテゴリービュー",
+    "timelineView": "タイムラインビュー",
+    "addEntry": "エントリーを追加",
+    "category": "カテゴリ",
+    "next_appointment": "次回予約"
   },
   "askAi": {
     "title": "AI に質問",
@@ -314,6 +341,7 @@
     "next": "次へ",
     "close": "閉じる",
     "noData": "データがありません",
+    "unknown": "不明",
     "collapse": "折りたたむ"
   }
 }

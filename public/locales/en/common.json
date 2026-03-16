@@ -66,10 +66,19 @@
     "scheduled": "Scheduled",
     "inProgress": "In Progress",
     "completed": "Completed",
-    "cancelled": "Cancelled"
+    "cancelled": "Cancelled",
+    "startRecording": "Start Recording",
+    "markInProgress": "Mark In Progress",
+    "markCompleted": "Mark Completed"
   },
   "recording": {
     "title": "Recording",
+    "subtitle": "Select a customer to start recording",
+    "noAppointmentsToday": "No appointments today",
+    "noAppointmentsHint": "Appointments will appear here when scheduled",
+    "currentAppointment": "Current Appointment",
+    "nextAppointmentLabel": "Next Appointment",
+    "loadFailed": "Failed to load appointments",
     "start": "Start Recording",
     "stop": "Stop Recording",
     "pause": "Pause",
@@ -78,7 +87,20 @@
     "processing": "Processing...",
     "selectCustomer": "Please select a customer",
     "permissionRequired": "Microphone permission is required",
-    "elapsed": "Elapsed Time"
+    "elapsed": "Elapsed Time",
+    "tapToStart": "Tap to start recording",
+    "paused": "Paused",
+    "customer": "Customer",
+    "browserNotSupported": "This browser does not support recording",
+    "recordingError": "Recording error",
+    "startFailed": "Failed to start recording",
+    "saved": "Recording saved",
+    "storageNotConfigured": "Recording storage is not configured. Run the Supabase SQL.",
+    "saveFailed": "Failed to save recording",
+    "notSupported": "Recording not supported",
+    "notSupportedHint": "This browser does not support recording. Use Safari or Chrome.",
+    "saving": "Saving recording...",
+    "staffNotFound": "Staff information not found"
   },
   "karute": {
     "title": "Karute",
@@ -113,7 +135,12 @@
     "history": "Karute History",
     "noEntries": "No entries",
     "confidence": "Confidence",
-    "originalQuote": "Original Quote"
+    "originalQuote": "Original Quote",
+    "categoriesView": "Category View",
+    "timelineView": "Timeline View",
+    "addEntry": "Add Entry",
+    "category": "Category",
+    "next_appointment": "Next Appointment"
   },
   "askAi": {
     "title": "Ask AI",
@@ -314,6 +341,7 @@
     "next": "Next",
     "close": "Close",
     "noData": "No data available",
+    "unknown": "Unknown",
     "collapse": "Collapse"
   }
 }
