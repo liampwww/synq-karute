@@ -187,7 +187,9 @@
     "colorfulMode": "カラフルモード",
     "colorfulModeDescription": "サイドバー・カード・ボタンに色を付けて、画面を分かりやすくします",
     "subtleColorMode": "ソフトカラーモード",
-    "subtleColorModeDescription": "カードにページごとの淡い色を付けて、見やすくします（録音=赤系、カルテ=緑系など）"
+    "subtleColorModeDescription": "カードにページごとの淡い色を付けて、見やすくします（録音=赤系、カルテ=緑系など）",
+    "iosStyle": "Apple iOS スタイル",
+    "iosStyleDescription": "丸みを帯びたカード、ソフトな影、ガラス風の質感で、Apple iOS 風の洗練された見た目に"
   },
   "insights": {
     "topProfessionalTopics": "よく出る職種関連トピック",

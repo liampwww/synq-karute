@@ -12,11 +12,13 @@ interface AppearanceState {
   cardElevation: CardElevation;
   colorfulMode: boolean;
   subtleColorMode: boolean;
+  iosStyle: boolean;
   setCoachingNotesStyle: (v: CoachingNotesStyle) => void;
   setUIDensity: (v: UIDensity) => void;
   setCardElevation: (v: CardElevation) => void;
   setColorfulMode: (v: boolean) => void;
   setSubtleColorMode: (v: boolean) => void;
+  setIosStyle: (v: boolean) => void;
   hydrate: () => void;
 }
 
@@ -32,6 +34,7 @@ function loadStored(): Partial<AppearanceState> {
       cardElevation: parsed.cardElevation as CardElevation | undefined,
       colorfulMode: parsed.colorfulMode as boolean | undefined,
       subtleColorMode: parsed.subtleColorMode as boolean | undefined,
+      iosStyle: parsed.iosStyle as boolean | undefined,
     };
   } catch {
     return {};
@@ -49,6 +52,7 @@ function save(state: AppearanceState) {
         cardElevation: state.cardElevation,
         colorfulMode: state.colorfulMode,
         subtleColorMode: state.subtleColorMode,
+        iosStyle: state.iosStyle,
       })
     );
   } catch {
@@ -62,6 +66,7 @@ export const useAppearanceStore = create<AppearanceState>((set, get) => ({
   cardElevation: "elevated",
   colorfulMode: false,
   subtleColorMode: false,
+  iosStyle: false,
   setCoachingNotesStyle: (v) => {
     set({ coachingNotesStyle: v });
     save({ ...get(), coachingNotesStyle: v });
@@ -82,6 +87,10 @@ export const useAppearanceStore = create<AppearanceState>((set, get) => ({
     set({ subtleColorMode: v });
     save({ ...get(), subtleColorMode: v });
   },
+  setIosStyle: (v) => {
+    set({ iosStyle: v });
+    save({ ...get(), iosStyle: v });
+  },
   hydrate: () => {
     const stored = loadStored();
     set((s) => ({
@@ -90,6 +99,7 @@ export const useAppearanceStore = create<AppearanceState>((set, get) => ({
       cardElevation: stored.cardElevation ?? s.cardElevation,
       colorfulMode: stored.colorfulMode ?? s.colorfulMode,
       subtleColorMode: stored.subtleColorMode ?? s.subtleColorMode,
+      iosStyle: stored.iosStyle ?? s.iosStyle,
     }));
   },
 }));

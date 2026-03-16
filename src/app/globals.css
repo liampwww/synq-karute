@@ -82,6 +82,211 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+/* Apple iOS 26 style theme */
+[data-ios-style="true"] {
+  --radius: 1.25rem;
+  --radius-sm: 0.75rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 1.75rem;
+  --radius-3xl: 2rem;
+  --radius-4xl: 2.25rem;
+}
+[data-ios-style="true"] {
+  --background: oklch(0.98 0.002 260);
+  --card: oklch(1 0 0 / 0.55);
+  --border: oklch(0.92 0.01 260 / 0.5);
+  --muted: oklch(0.97 0.005 260 / 0.6);
+  --sidebar: oklch(0.99 0.002 260 / 0.65);
+}
+.dark[data-ios-style="true"] {
+  --background: oklch(0.12 0.01 260);
+  --card: oklch(0.2 0.015 260 / 0.5);
+  --border: oklch(0.35 0.02 260 / 0.35);
+  --muted: oklch(0.22 0.01 260 / 0.5);
+  --sidebar: oklch(0.16 0.01 260 / 0.7);
+}
+
+[data-ios-style="true"] body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Liquid glass page background */
+[data-ios-style="true"] div.flex.h-screen.overflow-hidden.bg-background {
+  background: linear-gradient(
+    180deg,
+    oklch(0.985 0.003 260) 0%,
+    oklch(0.97 0.005 260) 50%,
+    oklch(0.96 0.006 260) 100%
+  ) !important;
+}
+.dark[data-ios-style="true"] div.flex.h-screen.overflow-hidden.bg-background {
+  background: linear-gradient(
+    180deg,
+    oklch(0.14 0.012 260) 0%,
+    oklch(0.12 0.01 260) 50%,
+    oklch(0.1 0.008 260) 100%
+  ) !important;
+}
+
+/* Liquid glass cards */
+[data-ios-style="true"] [data-slot="card"],
+[data-ios-style="true"] .rounded-xl {
+  border-radius: 1.25rem !important;
+  box-shadow:
+    0 0 0 1px oklch(1 0 0 / 0.12) inset,
+    0 1px 0 0 oklch(1 0 0 / 0.08),
+    0 4px 20px -6px rgb(0 0 0 / 0.08),
+    0 12px 40px -12px rgb(0 0 0 / 0.06) !important;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  background: linear-gradient(
+    135deg,
+    oklch(1 0 0 / 0.7) 0%,
+    oklch(0.99 0.002 260 / 0.5) 100%
+  ) !important;
+  border: 1px solid oklch(1 0 0 / 0.15) !important;
+}
+.dark[data-ios-style="true"] [data-slot="card"],
+.dark[data-ios-style="true"] .rounded-xl {
+  box-shadow:
+    0 0 0 1px oklch(1 0 0 / 0.06) inset,
+    0 1px 0 0 oklch(1 0 0 / 0.04),
+    0 4px 24px -6px rgb(0 0 0 / 0.3),
+    0 16px 48px -12px rgb(0 0 0 / 0.2) !important;
+  background: linear-gradient(
+    135deg,
+    oklch(0.22 0.015 260 / 0.6) 0%,
+    oklch(0.16 0.01 260 / 0.45) 100%
+  ) !important;
+  border: 1px solid oklch(1 0 0 / 0.08) !important;
+}
+
+[data-ios-style="true"] button,
+[data-ios-style="true"] [data-slot="button"],
+[data-ios-style="true"] input,
+[data-ios-style="true"] textarea,
+[data-ios-style="true"] select,
+[data-ios-style="true"] [role="combobox"] {
+  border-radius: 0.875rem !important;
+}
+
+[data-ios-style="true"] [data-slot="button"][data-variant="default"],
+[data-ios-style="true"] .bg-primary {
+  border-radius: 0.875rem !important;
+  box-shadow:
+    0 0 0 1px oklch(1 0 0 / 0.1) inset,
+    0 2px 8px -2px rgb(0 0 0 / 0.12) !important;
+}
+
+/* Liquid glass sidebar */
+[data-ios-style="true"] aside,
+[data-ios-style="true"] [data-slot="sidebar"] {
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  box-shadow: 1px 0 0 0 oklch(1 0 0 / 0.06) !important;
+  border-right: 1px solid oklch(1 0 0 / 0.08) !important;
+}
+.dark[data-ios-style="true"] aside {
+  box-shadow: 1px 0 0 0 oklch(1 0 0 / 0.06) !important;
+  border-right-color: oklch(1 0 0 / 0.1) !important;
+}
+
+/* Liquid glass header */
+[data-ios-style="true"] header {
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  box-shadow: 0 1px 0 0 oklch(1 0 0 / 0.06) !important;
+  border-bottom: 1px solid oklch(1 0 0 / 0.08) !important;
+}
+.dark[data-ios-style="true"] header {
+  box-shadow: 0 1px 0 0 oklch(1 0 0 / 0.06) !important;
+  border-bottom-color: oklch(1 0 0 / 0.1) !important;
+}
+
+[data-ios-style="true"] .app-content {
+  padding: 1.25rem !important;
+}
+@media (min-width: 1024px) {
+  [data-ios-style="true"] .app-content {
+    padding: 1.75rem !important;
+  }
+}
+
+[data-ios-style="true"] [data-slot="tabs-list"],
+[data-ios-style="true"] [role="tablist"] {
+  border-radius: 1rem !important;
+  padding: 0.25rem !important;
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  background: oklch(0.96 0.005 260 / 0.7) !important;
+  box-shadow: 0 0 0 1px oklch(1 0 0 / 0.08) inset !important;
+}
+.dark[data-ios-style="true"] [data-slot="tabs-list"] {
+  background: oklch(0.22 0.01 260 / 0.6) !important;
+}
+
+[data-ios-style="true"] [role="tab"] {
+  border-radius: 0.75rem !important;
+}
+
+[data-ios-style="true"] .badge,
+[data-ios-style="true"] [data-slot="badge"] {
+  border-radius: 0.5rem !important;
+  font-weight: 500 !important;
+}
+
+/* Liquid glass overlays */
+[data-ios-style="true"] [data-slot="dialog-overlay"],
+[data-ios-style="true"] [data-slot="sheet-overlay"] {
+  backdrop-filter: blur(12px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(150%) !important;
+  background: rgb(0 0 0 / 0.15) !important;
+}
+.dark[data-ios-style="true"] [data-slot="dialog-overlay"],
+.dark[data-ios-style="true"] [data-slot="sheet-overlay"] {
+  background: rgb(0 0 0 / 0.4) !important;
+}
+
+/* Liquid glass popovers, dropdowns, dialogs, sheets */
+[data-ios-style="true"] [data-slot="popover-content"],
+[data-ios-style="true"] [data-slot="dropdown-menu-content"],
+[data-ios-style="true"] [data-slot="dropdown-menu-sub-content"],
+[data-ios-style="true"] [data-slot="dialog-content"],
+[data-ios-style="true"] [data-slot="sheet-content"],
+[data-ios-style="true"] [data-slot="select-content"] {
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  box-shadow:
+    0 0 0 1px oklch(1 0 0 / 0.1) inset,
+    0 4px 24px -8px rgb(0 0 0 / 0.12),
+    0 16px 48px -16px rgb(0 0 0 / 0.08) !important;
+  border: 1px solid oklch(1 0 0 / 0.12) !important;
+}
+.dark[data-ios-style="true"] [data-slot="popover-content"],
+.dark[data-ios-style="true"] [data-slot="dropdown-menu-content"],
+.dark[data-ios-style="true"] [data-slot="dropdown-menu-sub-content"],
+.dark[data-ios-style="true"] [data-slot="dialog-content"],
+.dark[data-ios-style="true"] [data-slot="sheet-content"],
+.dark[data-ios-style="true"] [data-slot="select-content"] {
+  box-shadow:
+    0 0 0 1px oklch(1 0 0 / 0.06) inset,
+    0 4px 32px -8px rgb(0 0 0 / 0.35),
+    0 24px 64px -16px rgb(0 0 0 / 0.25) !important;
+  border-color: oklch(1 0 0 / 0.08) !important;
+}
+
+/* Liquid glass inputs */
+[data-ios-style="true"] input,
+[data-ios-style="true"] textarea,
+[data-ios-style="true"] [role="combobox"] {
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+}
+
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);

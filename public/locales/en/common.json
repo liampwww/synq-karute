@@ -187,7 +187,9 @@
     "colorfulMode": "Colorful mode",
     "colorfulModeDescription": "Add color to sidebar, cards, and buttons for easier navigation",
     "subtleColorMode": "Soft color mode",
-    "subtleColorModeDescription": "Add gentle page-specific tints to cards for easier viewing (e.g. recording=red, karute=green)"
+    "subtleColorModeDescription": "Add gentle page-specific tints to cards for easier viewing (e.g. recording=red, karute=green)",
+    "iosStyle": "Apple iOS Style",
+    "iosStyleDescription": "Rounded cards, soft shadows, and frosted glass effects for a refined Apple iOS look"
   },
   "insights": {
     "topProfessionalTopics": "Top Professional Topics",

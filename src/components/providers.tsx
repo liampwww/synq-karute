@@ -36,7 +36,7 @@ function ThemeProvider({ children }: { children: ReactNode }) {
 }
 
 function AppearanceSync({ children }: { children: ReactNode }) {
-  const { hydrate, uiDensity, cardElevation, colorfulMode, subtleColorMode } =
+  const { hydrate, uiDensity, cardElevation, colorfulMode, subtleColorMode, iosStyle } =
     useAppearanceStore();
 
   useEffect(() => {
@@ -49,7 +49,8 @@ function AppearanceSync({ children }: { children: ReactNode }) {
     document.documentElement.dataset.colorful = colorfulMode ? "true" : "false";
     document.documentElement.dataset.subtleColor =
       subtleColorMode ? "true" : "false";
-  }, [uiDensity, cardElevation, colorfulMode, subtleColorMode]);
+    document.documentElement.dataset.iosStyle = iosStyle ? "true" : "false";
+  }, [uiDensity, cardElevation, colorfulMode, subtleColorMode, iosStyle]);
 
   return <>{children}</>;
 }
