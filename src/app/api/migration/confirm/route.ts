@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
       .eq("id", jobId);
 
     const { data: fileData } = await supabase.storage
-      .from("recordings")
+      .from("migrations")
       .download(typedJob.uploaded_file_path!);
 
     if (!fileData) {

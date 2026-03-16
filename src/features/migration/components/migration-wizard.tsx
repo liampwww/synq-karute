@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Database, Upload, Settings, Play, Plug, Monitor, FileSpreadsheet } from "lucide-react";
+import { ArrowLeft, Database, Upload, Settings, Play } from "lucide-react";
 
-import { useI18n } from "@/lib/i18n/context";
 import type {
   FieldMapping,
   DedupStrategy,
@@ -14,52 +13,29 @@ import { useAuthStore } from "@/stores/auth-store";
 import { uploadMigrationFile, confirmMigration } from "@/features/migration/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileUploader } from "./file-uploader";
-import { ApiConnectorForm } from "./api-connector-form";
-import { BrowserAssistPaste } from "./browser-assist-paste";
 import { MappingEditor } from "./mapping-editor";
 import { MigrationProgress } from "./migration-progress";
 
 type WizardStep = "upload" | "mapping" | "importing" | "done";
-type ImportSource = "file" | "api" | "browser";
 
 const STEP_CONFIG = [
-  { key: "upload" as const, labelKey: "fileSelect", icon: Upload },
-  { key: "mapping" as const, labelKey: "mapping", icon: Settings },
-  { key: "importing" as const, labelKey: "import", icon: Play },
+  { key: "upload" as const, label: "ファイル選択", icon: Upload },
+  { key: "mapping" as const, label: "マッピング", icon: Settings },
+  { key: "importing" as const, label: "インポート", icon: Play },
 ];
 
-const SOURCE_OPTIONS: { id: ImportSource; icon: typeof FileSpreadsheet; labelKey: string }[] = [
-  { id: "file", icon: FileSpreadsheet, labelKey: "importSourceFile" },
-  { id: "api", icon: Plug, labelKey: "importSourceApi" },
-  { id: "browser", icon: Monitor, labelKey: "importSourceBrowser" },
-];
-
-interface MigrationWizardProps {
-  initialSource?: "file" | "api" | "browser" | null;
-  onSourceConsumed?: () => void;
-}
-
-export function MigrationWizard({ initialSource, onSourceConsumed }: MigrationWizardProps) {
-  const { t } = useI18n();
+export function MigrationWizard() {
   const organization = useAuthStore((s) => s.organization);
   const activeStaff = useAuthStore((s) => s.staff);
 
   const [step, setStep] = useState<WizardStep>("upload");
-  const [importSource, setImportSource] = useState<ImportSource>("file");
-
-  useEffect(() => {
-    if (initialSource && ["file", "api", "browser"].includes(initialSource)) {
-      setImportSource(initialSource);
-      onSourceConsumed?.();
-    }
-  }, [initialSource, onSourceConsumed]);
   const [isUploading, setIsUploading] = useState(false);
   const [jobId, setJobId] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
 
   const handleFileSelected = async (file: File) => {
     if (!organization || !activeStaff) {
-      toast.error(t("migration.orgError"));
+      toast.error("組織情報が取得できません");
       return;
     }
 
@@ -74,11 +50,11 @@ export function MigrationWizard({ initialSource, onSourceConsumed }: MigrationWi
       setAnalysis(result.analysis);
       setStep("mapping");
       toast.success(
-        `${result.analysis.totalRows}${t("migration.recordsDetected")}`
+        `${result.analysis.totalRows} 件のレコードを検出しました`
       );
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : t("migration.uploadFailed")
+        err instanceof Error ? err.message : "ファイルのアップロードに失敗しました"
       );
     } finally {
       setIsUploading(false);
@@ -96,7 +72,7 @@ export function MigrationWizard({ initialSource, onSourceConsumed }: MigrationWi
       setStep("importing");
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : t("migration.importStartFailed")
+        err instanceof Error ? err.message : "インポートの開始に失敗しました"
       );
     }
   };
@@ -139,7 +115,7 @@ export function MigrationWizard({ initialSource, onSourceConsumed }: MigrationWi
                   isActive ? "font-medium" : "text-muted-foreground"
                 }`}
               >
-                {t(`migration.${s.labelKey}`)}
+                {s.label}
               </span>
               {i < STEP_CONFIG.length - 1 && (
                 <div className="mx-2 h-px w-8 bg-border" />
@@ -150,70 +126,24 @@ export function MigrationWizard({ initialSource, onSourceConsumed }: MigrationWi
       </div>
 
       {step === "upload" && (
-        <div className="space-y-4">
-          <div className="flex gap-2 p-1 rounded-lg border bg-muted/30 w-fit">
-            {SOURCE_OPTIONS.map((opt) => {
-              const Icon = opt.icon;
-              const isActive = importSource === opt.id;
-              return (
-                <button
-                  key={opt.id}
-                  type="button"
-                  onClick={() => setImportSource(opt.id)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive
-                      ? "bg-background shadow-sm border"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <Icon className="size-4" />
-                  {t(`migration.${opt.labelKey}`)}
-                </button>
-              );
-            })}
-          </div>
-          {importSource === "file" && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Database className="size-5" />
-                  {t("migration.dataImport")}
-                </CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  {t("migration.dataImportDesc")}
-                </p>
-              </CardHeader>
-              <CardContent>
-                <FileUploader
-                  onFileSelected={handleFileSelected}
-                  isUploading={isUploading}
-                />
-              </CardContent>
-            </Card>
-          )}
-          {importSource === "api" && (
-            <ApiConnectorForm
-              onSuccess={(id, a) => {
-                setJobId(id);
-                setAnalysis(a);
-                setStep("mapping");
-                toast.success(`${a.totalRows}${t("migration.recordsDetected")}`);
-              }}
-            />
-          )}
-          {importSource === "browser" && (
-            <BrowserAssistPaste
-              onSuccess={(id, a) => {
-                setJobId(id);
-                setAnalysis(a);
-                setStep("mapping");
-                toast.success(`${a.totalRows}${t("migration.recordsDetected")}`);
-              }}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Database className="size-5" />
+              データインポート
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              他のシステムからエクスポートした顧客データをインポートします。
+              CSV / Excel ファイルに対応しています。
+            </p>
+          </CardHeader>
+          <CardContent>
+            <FileUploader
+              onFileSelected={handleFileSelected}
               isUploading={isUploading}
-              setIsUploading={setIsUploading}
             />
-          )}
-        </div>
+          </CardContent>
+        </Card>
       )}
 
       {step === "mapping" && analysis && (
@@ -236,9 +166,10 @@ export function MigrationWizard({ initialSource, onSourceConsumed }: MigrationWi
               <Database className="size-8" />
             </div>
             <div className="text-center space-y-1">
-              <h3 className="text-lg font-semibold">{t("migration.importComplete")}</h3>
+              <h3 className="text-lg font-semibold">インポート完了</h3>
               <p className="text-sm text-muted-foreground">
-                {t("migration.importCompleteDesc")}
+                顧客データのインポートが完了しました。
+                顧客一覧ページで確認できます。
               </p>
             </div>
             <div className="flex gap-2">
@@ -247,7 +178,7 @@ export function MigrationWizard({ initialSource, onSourceConsumed }: MigrationWi
                 className="inline-flex items-center gap-1.5 rounded-md border px-4 py-2 text-sm hover:bg-accent transition-colors"
               >
                 <ArrowLeft className="size-4" />
-                {t("migration.importAnother")}
+                別のファイルをインポート
               </button>
             </div>
           </CardContent>

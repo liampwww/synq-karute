@@ -37,10 +37,10 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    const storagePath = `migrations/${orgId}/${Date.now()}_${file.name}`;
+    const storagePath = `${orgId}/${Date.now()}_${file.name}`;
     const { error: uploadError } = await supabase.storage
-      .from("recordings")
-      .upload(storagePath, buffer, { contentType: file.type });
+      .from("migrations")
+      .upload(storagePath, buffer, { contentType: "application/octet-stream" });
 
     if (uploadError) {
       return NextResponse.json(

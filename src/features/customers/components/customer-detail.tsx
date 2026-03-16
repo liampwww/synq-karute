@@ -22,7 +22,6 @@ import { toast } from "sonner";
 
 import type { Tables } from "@/types/database";
 import { useI18n } from "@/lib/i18n/context";
-import { TranslatedText } from "@/components/translated-text";
 import { createClient } from "@/lib/supabase/client";
 import { getBusinessType } from "@/lib/business-types";
 import { useAuthStore } from "@/stores/auth-store";
@@ -45,7 +44,6 @@ import {
 import { CustomerForm } from "./customer-form";
 import { CustomerTimeline } from "@/features/timeline/components/customer-timeline";
 import { InsightCards } from "@/features/insights/components/insight-cards";
-import { CustomerInsightCard } from "@/features/insights/components/customer-insight-card";
 import { PhotoGallery } from "@/features/photos/components/photo-gallery";
 
 type KaruteRecord = Tables<"karute_records">;
@@ -280,7 +278,7 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
                 {customer.first_visit_at && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar className="size-4" />
-                    <span>{t("profile.firstVisitShort")}: {format(new Date(customer.first_visit_at), "yyyy/MM/dd")}</span>
+                    <span>初回: {format(new Date(customer.first_visit_at), "yyyy/MM/dd")}</span>
                   </div>
                 )}
               </div>
@@ -300,7 +298,7 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
               {customer.visit_count > 0 && (
                 <div className="rounded-lg border bg-card px-3 py-2 text-center min-w-[80px]">
                   <p className="text-lg font-bold tabular-nums">{customer.visit_count}</p>
-                  <p className="text-[10px] text-muted-foreground">{t("customer.visits")}</p>
+                  <p className="text-[10px] text-muted-foreground">来店</p>
                 </div>
               )}
               {daysSinceLastVisit != null && (
@@ -308,7 +306,7 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
                   <p className={`text-lg font-bold tabular-nums ${daysSinceLastVisit > 90 ? "text-red-500" : daysSinceLastVisit > 60 ? "text-orange-500" : ""}`}>
                     {daysSinceLastVisit}
                   </p>
-                  <p className="text-[10px] text-muted-foreground">{t("customer.daysAgo")}</p>
+                  <p className="text-[10px] text-muted-foreground">日前</p>
                 </div>
               )}
             </div>
@@ -319,7 +317,7 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
               <Separator className="my-4" />
               <div className="space-y-1">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  {t("customer.notes")}
+                  メモ
                 </p>
                 <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                   {customer.notes}
@@ -335,10 +333,10 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
           <AlertTriangle className="size-5 text-red-500 shrink-0" />
           <div>
             <p className="text-sm font-medium text-red-700 dark:text-red-400">
-              {t("customer.churnRisk")}: {daysSinceLastVisit} {t("customer.churnRiskDesc")}
+              離脱リスク: {daysSinceLastVisit}日間来店がありません
             </p>
             <p className="text-xs text-red-600/80 dark:text-red-400/70 mt-0.5">
-              {t("customer.churnRiskHint")}
+              再来店促進のフォローアップを検討してください
             </p>
           </div>
         </div>
@@ -350,25 +348,23 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
         </CardContent>
       </Card>
 
-      <CustomerInsightCard customerId={customerId} />
-
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="timeline" className="flex items-center gap-1.5">
             <Activity className="size-3.5" />
-            {t("tabs.timeline")}
+            タイムライン
           </TabsTrigger>
           <TabsTrigger value="karute" className="flex items-center gap-1.5">
             <FileText className="size-3.5" />
-            {t("tabs.karute")}
+            カルテ
           </TabsTrigger>
           <TabsTrigger value="photos" className="flex items-center gap-1.5">
             <Camera className="size-3.5" />
-            {t("tabs.photos")}
+            写真
           </TabsTrigger>
           <TabsTrigger value="profile" className="flex items-center gap-1.5">
             <User className="size-3.5" />
-            {t("tabs.details")}
+            詳細
           </TabsTrigger>
         </TabsList>
 
@@ -448,23 +444,23 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
                               className="text-xs"
                             >
                               {karute.status === "approved"
-                                ? t("karute.statusApproved")
+                                ? "承認済"
                                 : karute.status === "review"
-                                  ? t("karute.statusReview")
-                                  : t("karute.statusDraft")}
+                                  ? "レビュー中"
+                                  : "下書き"}
                             </Badge>
                           </div>
 
                           {karute.ai_summary && (
                             <p className="text-sm text-muted-foreground leading-relaxed">
-                              <TranslatedText text={karute.ai_summary} as="span" />
+                              {karute.ai_summary}
                             </p>
                           )}
 
                           {proEntries.length > 0 && (
                             <div className="space-y-1.5">
                               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                                {t("karute.professional")}
+                                職種関連
                               </p>
                               <ul className="space-y-1 pl-1">
                                 {proEntries.map((entry) => (
@@ -476,10 +472,10 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
                                     <span>
                                       {entry.subcategory && (
                                         <span className="font-medium text-foreground/70">
-                                          <TranslatedText text={entry.subcategory} as="span" />:{" "}
+                                          {entry.subcategory}:{" "}
                                         </span>
                                       )}
-                                      <TranslatedText text={entry.content} as="span" />
+                                      {entry.content}
                                     </span>
                                   </li>
                                 ))}
@@ -490,7 +486,7 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
                           {personalEntries.length > 0 && (
                             <div className="space-y-1.5">
                               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                                {t("karute.personal")}
+                                個人的な話題
                               </p>
                               <ul className="space-y-1 pl-1">
                                 {personalEntries.map((entry) => (
@@ -502,10 +498,10 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
                                     <span>
                                       {entry.subcategory && (
                                         <span className="font-medium text-foreground/70">
-                                          <TranslatedText text={entry.subcategory} as="span" />:{" "}
+                                          {entry.subcategory}:{" "}
                                         </span>
                                       )}
-                                      <TranslatedText text={entry.content} as="span" />
+                                      {entry.content}
                                     </span>
                                   </li>
                                 ))}
@@ -526,7 +522,7 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
                                 className="size-3"
                                 data-icon="inline-start"
                               />
-                              {t("karute.viewDetails")}
+                              詳細を見る
                             </Button>
                           </div>
                         </CardContent>
@@ -552,30 +548,30 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <User className="size-4" />
-                {t("profile.title")}
+                顧客詳細情報
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t("profile.registeredDate")}</p>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">登録日</p>
                   <p className="text-sm">{format(new Date(customer.created_at), "yyyy/MM/dd")}</p>
                 </div>
                 {customer.first_visit_at && (
                   <div className="space-y-1">
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t("profile.firstVisit")}</p>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">初回来店</p>
                     <p className="text-sm">{format(new Date(customer.first_visit_at), "yyyy/MM/dd")}</p>
                   </div>
                 )}
                 {customer.last_visit_at && (
                   <div className="space-y-1">
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t("profile.lastVisit")}</p>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">最終来店</p>
                     <p className="text-sm">{format(new Date(customer.last_visit_at), "yyyy/MM/dd")}</p>
                   </div>
                 )}
                 <div className="space-y-1">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t("profile.totalVisits")}</p>
-                  <p className="text-sm">{customer.visit_count ?? 0}</p>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">累計来店回数</p>
+                  <p className="text-sm">{customer.visit_count ?? 0}回</p>
                 </div>
               </div>
 
@@ -583,9 +579,9 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
                 <>
                   <Separator />
                   <div className="space-y-1">
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t("karute.aiSummary")}</p>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">AIサマリー</p>
                     <p className="text-sm text-muted-foreground whitespace-pre-line leading-relaxed">
-                      <TranslatedText text={profile!.ai_summary as string} as="span" />
+                      {profile!.ai_summary as string}
                     </p>
                   </div>
                 </>
@@ -595,7 +591,7 @@ export function CustomerDetail({ customerId }: CustomerDetailProps) {
                 <>
                   <Separator />
                   <div className="space-y-1">
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t("profile.staffNotes")}</p>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">スタッフメモ</p>
                     <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                       {customer.notes}
                     </p>

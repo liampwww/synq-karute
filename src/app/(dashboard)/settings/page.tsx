@@ -12,8 +12,6 @@ import {
   Sun,
   Mail,
   Shield,
-  Webhook,
-  Palette,
 } from "lucide-react";
 
 import { toast } from "sonner";
@@ -22,12 +20,6 @@ import { createClient } from "@/lib/supabase/client";
 import { useI18n } from "@/lib/i18n/context";
 import type { Locale } from "@/lib/i18n/config";
 import { useAuthStore } from "@/stores/auth-store";
-import {
-  useAppearanceStore,
-  type UIDensity,
-  type CardElevation,
-  type CoachingNotesStyle,
-} from "@/stores/appearance-store";
 import type { Tables } from "@/types/database";
 import {
   BUSINESS_TYPES,
@@ -51,7 +43,6 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -109,29 +100,9 @@ function useLocalStorageState(
 export default function SettingsPage() {
   const { t, locale, setLocale } = useI18n();
   const { organization } = useAuthStore();
-  const {
-    uiDensity,
-    cardElevation,
-    coachingNotesStyle,
-    colorfulMode,
-    subtleColorMode,
-    setUIDensity,
-    setCardElevation,
-    setCoachingNotesStyle,
-    setColorfulMode,
-    setSubtleColorMode,
-    iosStyle,
-    setIosStyle,
-  } = useAppearanceStore();
 
   const [staffMembers, setStaffMembers] = useState<Tables<"staff">[]>([]);
   const [staffLoading, setStaffLoading] = useState(true);
-  const [webhookUrl, setWebhookUrl] = useState("");
-
-  const [settingsTab, setSettingsTab] = useLocalStorageState(
-    "synq-karute-settings-tab",
-    "0"
-  );
 
   const [aiModel, setAiModel] = useLocalStorageState(
     "synq-karute-ai-model",
@@ -185,11 +156,6 @@ export default function SettingsPage() {
     fetchStaff();
   }, [organization?.id]);
 
-  useEffect(() => {
-    const s = organization?.settings as { webhook_url?: string } | null;
-    setWebhookUrl(s?.webhook_url ?? "");
-  }, [organization?.settings]);
-
   return (
     <motion.div
       variants={pageVariants}
@@ -203,35 +169,39 @@ export default function SettingsPage() {
         </h1>
       </div>
 
-      <Tabs value={settingsTab} onValueChange={setSettingsTab}>
+      <Tabs defaultValue={0}>
         <TabsList className="w-full flex-wrap h-auto gap-1">
-          <TabsTrigger value="0" className="gap-1.5">
+          <TabsTrigger value={0} className="gap-1.5">
             <Building2 className="size-3.5" />
             {t("settings.organization")}
           </TabsTrigger>
-          <TabsTrigger value="1" className="gap-1.5">
+          <TabsTrigger value={1} className="gap-1.5">
             <Brain className="size-3.5" />
             {t("settings.ai")}
           </TabsTrigger>
-          <TabsTrigger value="2" className="gap-1.5">
+          <TabsTrigger value={2} className="gap-1.5">
             <Mic className="size-3.5" />
             {t("settings.recording")}
           </TabsTrigger>
-          <TabsTrigger value="3" className="gap-1.5">
+          <TabsTrigger value={3} className="gap-1.5">
             <UsersRound className="size-3.5" />
             {t("settings.staff")}
           </TabsTrigger>
-          <TabsTrigger value="4" className="gap-1.5">
+          <TabsTrigger value={4} className="gap-1.5">
             <Globe className="size-3.5" />
             {t("settings.language")}
           </TabsTrigger>
-          <TabsTrigger value="5" className="gap-1.5">
-            <Palette className="size-3.5" />
-            {t("settings.appearance")}
+          <TabsTrigger value={5} className="gap-1.5">
+            {isDark ? (
+              <Moon className="size-3.5" />
+            ) : (
+              <Sun className="size-3.5" />
+            )}
+            {t("settings.theme")}
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="0" className="mt-4">
+        <TabsContent value={0} className="mt-4">
           <Card>
             <CardHeader>
               <CardTitle>{t("settings.organization")}</CardTitle>
@@ -288,52 +258,6 @@ export default function SettingsPage() {
                 </div>
               </div>
               <Separator />
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
-                  <Webhook className="size-3.5" />
-                  {locale === "ja" ? "Webhook URL" : "Webhook URL"}
-                </Label>
-                <Input
-                  type="url"
-                  placeholder="https://..."
-                  value={webhookUrl}
-                  onChange={(e) => setWebhookUrl(e.target.value)}
-                  onBlur={async () => {
-                    if (!organization?.id) return;
-                    const supabase = createClient();
-                    const s = (organization.settings as Record<string, unknown>) ?? {};
-                    const next = { ...s, webhook_url: webhookUrl || null };
-                    const { error } = await supabase
-                      .from("organizations")
-                      .update({ settings: next })
-                      .eq("id", organization.id);
-                    if (error) {
-                      toast.error(
-                        locale === "ja"
-                          ? "Webhook URLの保存に失敗しました"
-                          : "Failed to save webhook URL"
-                      );
-                    } else {
-                      useAuthStore.getState().setOrganization({
-                        ...organization,
-                        settings: next,
-                      });
-                      toast.success(
-                        locale === "ja"
-                          ? "Webhook URLを保存しました"
-                          : "Webhook URL saved"
-                      );
-                    }
-                  }}
-                  className="font-mono text-sm"
-                />
-                <p className="text-xs text-muted-foreground">
-                  {locale === "ja"
-                    ? "カルテ作成時にこのURLへPOSTします。SYNQ Reserve連携などに使用できます。"
-                    : "POSTs to this URL when a karute is created. Use for SYNQ Reserve integration."}
-                </p>
-              </div>
-              <Separator />
               <p className="text-xs text-muted-foreground">
                 {locale === "ja"
                   ? "業種に応じてAIの分類カテゴリが自動的に切り替わります。"
@@ -343,7 +267,7 @@ export default function SettingsPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="1" className="mt-4">
+        <TabsContent value={1} className="mt-4">
           <Card>
             <CardHeader>
               <CardTitle>{t("settings.ai")}</CardTitle>
@@ -417,7 +341,7 @@ export default function SettingsPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="2" className="mt-4">
+        <TabsContent value={2} className="mt-4">
           <Card>
             <CardHeader>
               <CardTitle>{t("settings.recording")}</CardTitle>
@@ -506,12 +430,14 @@ export default function SettingsPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="3" className="mt-4">
+        <TabsContent value={3} className="mt-4">
           <Card>
             <CardHeader>
               <CardTitle>{t("settings.staff")}</CardTitle>
               <CardDescription>
-                {t("settings.staffDescription")}
+                {locale === "ja"
+                  ? "組織内のスタッフ一覧"
+                  : "Staff members in your organization"}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -559,18 +485,22 @@ export default function SettingsPage() {
               )}
               <Separator className="my-4" />
               <p className="text-xs text-muted-foreground">
-                {t("settings.staffComingSoon")}
+                {locale === "ja"
+                  ? "スタッフの追加・編集は今後のアップデートで対応予定です。"
+                  : "Adding and editing staff will be available in a future update."}
               </p>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="4" className="mt-4">
+        <TabsContent value={4} className="mt-4">
           <Card>
             <CardHeader>
               <CardTitle>{t("settings.language")}</CardTitle>
               <CardDescription>
-                {t("settings.languageDesc")}
+                {locale === "ja"
+                  ? "表示言語を選択してください"
+                  : "Choose your display language"}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -581,8 +511,8 @@ export default function SettingsPage() {
                     <p className="text-sm font-medium">日本語 / English</p>
                     <p className="text-xs text-muted-foreground">
                       {locale === "ja"
-                        ? t("settings.currentLocaleJa")
-                        : t("settings.currentLocaleEn")}
+                        ? "現在: 日本語"
+                        : "Current: English"}
                     </p>
                   </div>
                 </div>
@@ -599,8 +529,8 @@ export default function SettingsPage() {
                       setLocale(newLocale);
                       toast.success(
                         newLocale === "ja"
-                          ? t("settings.switchedToJa")
-                          : t("settings.switchedToEn")
+                          ? "日本語に切り替えました"
+                          : "Switched to English"
                       );
                     }}
                   />
@@ -615,96 +545,17 @@ export default function SettingsPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="5" className="mt-4">
+        <TabsContent value={5} className="mt-4">
           <Card>
             <CardHeader>
-              <CardTitle>{t("settings.appearance")}</CardTitle>
+              <CardTitle>{t("settings.theme")}</CardTitle>
               <CardDescription>
                 {locale === "ja"
-                  ? "SYNQ カルテの見た目をカスタマイズします"
-                  : "Customize how SYNQ Karute looks"}
+                  ? "アプリの外観を設定します"
+                  : "Customize the app appearance"}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center justify-between rounded-xl border-2 p-4 bg-gradient-to-r from-indigo-50/50 to-purple-50/50 dark:from-indigo-950/30 dark:to-purple-950/30">
-                <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-600 dark:text-indigo-400">
-                    <Palette className="size-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold">{t("settings.colorfulMode")}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {t("settings.colorfulModeDescription")}
-                    </p>
-                  </div>
-                </div>
-                <Switch
-                  checked={colorfulMode}
-                  onCheckedChange={(checked) => {
-                    setColorfulMode(checked);
-                    toast.success(
-                      locale === "ja"
-                        ? (checked ? "カラフルモードをオンにしました" : "カラフルモードをオフにしました")
-                        : (checked ? "Colorful mode on" : "Colorful mode off")
-                    );
-                  }}
-                />
-              </div>
-
-              <div className="flex items-center justify-between rounded-xl border-2 p-4 bg-gradient-to-r from-slate-50/80 to-zinc-50/80 dark:from-slate-950/40 dark:to-zinc-950/40">
-                <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-lg bg-rose-500/15 text-rose-600 dark:text-rose-400">
-                    <Palette className="size-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold">{t("settings.subtleColorMode")}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {t("settings.subtleColorModeDescription")}
-                    </p>
-                  </div>
-                </div>
-                <Switch
-                  checked={subtleColorMode}
-                  onCheckedChange={(checked) => {
-                    setSubtleColorMode(checked);
-                    toast.success(
-                      locale === "ja"
-                        ? (checked ? "ソフトカラーモードをオンにしました" : "ソフトカラーモードをオフにしました")
-                        : (checked ? "Soft color mode on" : "Soft color mode off")
-                    );
-                  }}
-                />
-              </div>
-
-              <div className="flex items-center justify-between rounded-xl border-2 p-4 bg-gradient-to-r from-slate-50/80 via-gray-50/80 to-zinc-50/80 dark:from-slate-950/40 dark:via-gray-950/40 dark:to-zinc-950/40">
-                <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-2xl bg-gradient-to-br from-gray-400/20 to-gray-500/20 text-gray-600 dark:text-gray-300">
-                    <svg className="size-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold">{t("settings.iosStyle")}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {t("settings.iosStyleDescription")}
-                    </p>
-                  </div>
-                </div>
-                <Switch
-                  checked={iosStyle}
-                  onCheckedChange={(checked) => {
-                    setIosStyle(checked);
-                    toast.success(
-                      locale === "ja"
-                        ? (checked ? "iOSスタイルをオンにしました" : "iOSスタイルをオフにしました")
-                        : (checked ? "iOS style on" : "iOS style off")
-                    );
-                  }}
-                />
-              </div>
-
-              <Separator />
-
+            <CardContent className="space-y-4">
               <div className="flex items-center justify-between rounded-lg border p-4">
                 <div className="flex items-center gap-3">
                   {isDark ? (
@@ -729,100 +580,6 @@ export default function SettingsPage() {
                   checked={isDark}
                   onCheckedChange={toggleTheme}
                 />
-              </div>
-
-              <Separator />
-
-              <div className="space-y-2">
-                <Label>{t("settings.uiDensity")}</Label>
-                <Select
-                  value={uiDensity}
-                  onValueChange={(v) => {
-                    setUIDensity(v as UIDensity);
-                    toast.success(
-                      locale === "ja" ? "余白を更新しました" : "Spacing updated"
-                    );
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="compact">
-                      {t("settings.uiDensityCompact")}
-                    </SelectItem>
-                    <SelectItem value="relaxed">
-                      {t("settings.uiDensityRelaxed")}
-                    </SelectItem>
-                    <SelectItem value="spacious">
-                      {t("settings.uiDensitySpacious")}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-muted-foreground">
-                  {locale === "ja"
-                    ? "画面全体の余白と要素の密度を調整します"
-                    : "Adjust spacing and density across the app"}
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label>{t("settings.cardElevation")}</Label>
-                <Select
-                  value={cardElevation}
-                  onValueChange={(v) => {
-                    setCardElevation(v as CardElevation);
-                    toast.success(
-                      locale === "ja"
-                        ? "カードの影を更新しました"
-                        : "Card style updated"
-                    );
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="subtle">
-                      {t("settings.cardElevationSubtle")}
-                    </SelectItem>
-                    <SelectItem value="elevated">
-                      {t("settings.cardElevationElevated")}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-muted-foreground">
-                  {locale === "ja"
-                    ? "カードの影の強さを調整します"
-                    : "Adjust card shadow depth"}
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div>
-                  <p className="text-sm font-medium">
-                    {t("settings.coachingNotesStyle")}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {t("settings.coachingNotesDesc")}
-                  </p>
-                </div>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <span className="text-xs text-muted-foreground">
-                    {coachingNotesStyle === "styled"
-                      ? t("settings.coachingNotesStyled")
-                      : t("settings.coachingNotesMinimal")}
-                  </span>
-                  <Switch
-                    checked={coachingNotesStyle === "styled"}
-                    onCheckedChange={(checked) => {
-                      setCoachingNotesStyle(
-                        (checked ? "styled" : "minimal") as CoachingNotesStyle
-                      );
-                      toast.success(t("settings.coachingNotesUpdated"));
-                    }}
-                  />
-                </label>
               </div>
             </CardContent>
           </Card>

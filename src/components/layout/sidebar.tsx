@@ -13,7 +13,6 @@ import {
   MessageSquare,
   Database,
   Settings,
-  BarChart3,
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
@@ -38,7 +37,6 @@ export const NAV_ITEMS = [
   { key: "appointments", href: "/appointments", icon: Calendar },
   { key: "karute", href: "/karute", icon: FileText },
   { key: "recording", href: "/recording", icon: Mic },
-  { key: "analytics", href: "/analytics", icon: BarChart3 },
   { key: "askAi", href: "/ask-ai", icon: MessageSquare },
   { key: "migration", href: "/migration", icon: Database },
   { key: "settings", href: "/settings", icon: Settings },
@@ -58,7 +56,7 @@ export function Sidebar() {
       transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
     >
       <div className="flex h-16 items-center gap-2.5 overflow-hidden px-4 shrink-0">
-        <div className="sidebar-logo flex size-9 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground font-bold text-sm">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground font-bold text-sm">
           S
         </div>
         <AnimatePresence>
@@ -70,7 +68,7 @@ export function Sidebar() {
               exit={{ opacity: 0, width: 0 }}
               transition={{ duration: 0.15 }}
             >
-              {t("app.name")}
+              SYNQ カルテ
             </motion.span>
           )}
         </AnimatePresence>
@@ -88,8 +86,6 @@ export function Sidebar() {
             const linkElement = (
               <Link
                 href={href}
-                data-nav-key={key}
-                data-active={isActive ? "true" : "false"}
                 className={cn(
                   "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-150",
                   "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
@@ -157,7 +153,7 @@ export function Sidebar() {
           ) : (
             <>
               <ChevronsLeft className="size-4" />
-              <span className="text-xs">{t("common.collapse")}</span>
+              <span className="text-xs">Collapse</span>
             </>
           )}
         </Button>

@@ -7,7 +7,6 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { AudioRecorder } from "@/lib/audio/recorder";
-import { useI18n } from "@/lib/i18n/context";
 import { useRecordingStore } from "@/stores/recording-store";
 import { useAuthStore } from "@/stores/auth-store";
 import {
@@ -32,7 +31,6 @@ export function RecordingControls({
   customerName,
   appointmentId,
 }: RecordingControlsProps) {
-  const { t } = useI18n();
   const recorderRef = useRef<AudioRecorder | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -84,12 +82,12 @@ export function RecordingControls({
 
   const handleStart = useCallback(async () => {
     if (!staff || !organization) {
-      toast.error(t("recording.staffNotFound"));
+      toast.error("スタッフ情報が見つかりません");
       return;
     }
 
     if (!AudioRecorder.isSupported()) {
-      toast.error(t("recording.browserNotSupported"));
+      toast.error("このブラウザは録音に対応していません");
       return;
     }
 
@@ -105,7 +103,7 @@ export function RecordingControls({
       recorder.setCallbacks({
         onAudioLevel: (level) => setAudioLevel(level),
         onError: (error) => {
-          toast.error(`${t("recording.recordingError")}: ${error.message}`);
+          toast.error(`録音エラー: ${error.message}`);
           stopTimer();
           endSession();
         },
@@ -126,7 +124,7 @@ export function RecordingControls({
       if (err instanceof DOMException && err.name === "NotAllowedError") {
         toast.error("マイクへのアクセスが拒否されました。設定を確認してください。");
       } else {
-        toast.error(t("recording.startFailed"));
+        toast.error("録音を開始できませんでした");
       }
     }
   }, [
@@ -189,7 +187,7 @@ export function RecordingControls({
         audio_storage_path: storagePath,
       });
 
-      toast.success(t("recording.saved"));
+      toast.success("録音を保存しました");
 
       const businessType = organization?.type ?? "hair";
 
@@ -203,14 +201,8 @@ export function RecordingControls({
         `カルテを作成しました（${result.entryCount}件の情報を抽出）`,
         { id: "pipeline" }
       );
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      console.error("Recording save failed:", err);
-      toast.error(
-        msg.includes("bucket") || msg.includes("Bucket")
-          ? t("recording.storageNotConfigured")
-          : `${t("recording.saveFailed")}: ${msg.slice(0, 80)}`
-      );
+    } catch {
+      toast.error("録音の保存に失敗しました");
       if (recordingId) {
         await updateRecordingSession(recordingId, {
           status: "failed",
@@ -265,7 +257,7 @@ export function RecordingControls({
           <Loader2 className="h-10 w-10 animate-spin text-primary" />
         </motion.div>
         <p className="text-lg font-medium text-muted-foreground">
-          {t("recording.saving")}
+          録音を保存中...
         </p>
       </div>
     );
@@ -274,7 +266,7 @@ export function RecordingControls({
   return (
     <div className="flex flex-col items-center gap-6 py-8">
       <div className="text-center">
-        <p className="text-sm text-muted-foreground">{t("recording.customer")}</p>
+        <p className="text-sm text-muted-foreground">お客様</p>
         <p className="text-lg font-semibold">{customerName}</p>
       </div>
 
@@ -295,7 +287,7 @@ export function RecordingControls({
               <Mic className="h-12 w-12" />
             </button>
             <p className="text-sm font-medium text-muted-foreground">
-              {t("recording.tapToStart")}
+              タップして録音開始
             </p>
           </motion.div>
         ) : (
@@ -381,7 +373,7 @@ export function RecordingControls({
             </div>
 
             <p className="text-xs text-muted-foreground">
-              {isPaused ? t("recording.paused") : t("recording.recording")}
+              {isPaused ? "一時停止中" : "録音中..."}
             </p>
           </motion.div>
         )}

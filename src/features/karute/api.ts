@@ -44,7 +44,6 @@ export interface KaruteRecordDetail {
   org_id: string;
   business_type: string;
   ai_summary: string | null;
-  staff_advice: string | null;
   status: string;
   created_at: string;
   updated_at: string;

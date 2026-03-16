@@ -26,7 +26,6 @@ ${biz.personal.map((p, i) => `${i + 1}. ${p}`).join("\n")}
 以下のJSON形式で出力してください：
 {
   "summary": "会話全体の要約（2-3文）",
-  "staffAdvice": "次回施術前のスタッフ向けアドバイス（1-2文、具体的で実践的に）",
   "entries": [
     {
       "category": "professional" または "personal",
@@ -44,24 +43,7 @@ ${biz.personal.map((p, i) => `${i + 1}. ${p}`).join("\n")}
 - confidenceは情報の確実性を表します
 - 職種に関連する専門的な内容はprofessional、雑談や個人的な話題はpersonalに分類してください
 - 次回予約に関する言及は professional カテゴリの最後の項目として記録してください
-- original_quoteは必ず元の会話から直接引用してください
-- staffAdviceは今回の会話と顧客履歴を踏まえ、次回の施術でスタッフが意識すべき点を具体的に書いてください`;
-}
-
-export function getClassificationPromptWithHistory(
-  businessType: string,
-  customerHistory: { summary: string; date: string }[]
-): string {
-  const base = getClassificationPrompt(businessType);
-  if (customerHistory.length === 0) return base;
-
-  const historyBlock = `
-## 顧客の過去カルテ履歴（参考）
-${customerHistory.map((h) => `- ${h.date}: ${h.summary}`).join("\n")}
-
-上記の履歴を踏まえ、今回の会話を分析し、staffAdviceでは過去の傾向や継続的な課題も考慮したアドバイスを出力してください。
-`;
-  return base.replace("## 出力形式", historyBlock + "\n## 出力形式");
+- original_quoteは必ず元の会話から直接引用してください`;
 }
 
 export const ASK_AI_SYSTEM_PROMPT = `あなたはカルテデータを活用するAIアシスタントです。

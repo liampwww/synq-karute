@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, type ReactNode } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   Sun,
   Moon,
@@ -18,15 +18,19 @@ import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/context";
 import { useRecordingStore } from "@/stores/recording-store";
 import { useAuthStore } from "@/stores/auth-store";
+import { logout } from "@/features/auth/actions";
 import { createClient } from "@/lib/supabase/client";
 import type { Tables } from "@/types/database";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
 import {
   Sheet,
   SheetTrigger,
@@ -58,25 +62,13 @@ const PAGE_TITLE_MAP: Record<string, string> = {
 
 export function Header({ children }: HeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
-  const [staffSwitcherOpen, setStaffSwitcherOpen] = useState(false);
   const [allStaff, setAllStaff] = useState<Tables<"staff">[]>([]);
   const pathname = usePathname();
   const { t, locale, setLocale } = useI18n();
   const isRecording = useRecordingStore((s) => s.isRecording);
   const elapsedSeconds = useRecordingStore((s) => s.elapsedSeconds);
-  const router = useRouter();
   const staff = useAuthStore((s) => s.staff);
   const organization = useAuthStore((s) => s.organization);
-
-  const handleLogout = useCallback(async () => {
-    const { createClient } = await import("@/lib/supabase/client");
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    useAuthStore.getState().reset();
-    router.push("/login");
-    router.refresh();
-  }, [router]);
 
   useEffect(() => {
     if (!organization?.id) return;
@@ -90,18 +82,12 @@ export function Header({ children }: HeaderProps) {
       });
   }, [organization?.id]);
 
-  const switchStaff = useCallback((s: Tables<"staff">) => {
-    useAuthStore.getState().setStaff(s);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("synq-karute-selected-staff-id", s.id);
-    }
-    setStaffSwitcherOpen(false);
-  }, []);
-
-  const doLogout = useCallback(() => {
-    setProfileOpen(false);
-    handleLogout();
-  }, [handleLogout]);
+  const switchStaff = useCallback(
+    (s: Tables<"staff">) => {
+      useAuthStore.getState().setStaff(s);
+    },
+    []
+  );
 
   const titleKey =
     Object.entries(PAGE_TITLE_MAP).find(([path]) =>
@@ -145,7 +131,7 @@ export function Header({ children }: HeaderProps) {
                 S
               </div>
               <SheetTitle className="text-base font-semibold tracking-tight">
-                {t("app.name")}
+                SYNQ カルテ
               </SheetTitle>
             </div>
             <Separator />
@@ -221,11 +207,10 @@ export function Header({ children }: HeaderProps) {
         </Button>
 
         {allStaff.length > 1 && (
-          <Popover open={staffSwitcherOpen} onOpenChange={setStaffSwitcherOpen}>
-            <PopoverTrigger
+          <DropdownMenu>
+            <DropdownMenuTrigger
               render={
                 <Button
-                  type="button"
                   variant="ghost"
                   size="sm"
                   className="gap-1.5 text-muted-foreground hover:text-foreground"
@@ -236,40 +221,32 @@ export function Header({ children }: HeaderProps) {
               <span className="text-xs font-medium max-w-[80px] truncate">
                 {staff?.name}
               </span>
-            </PopoverTrigger>
-            <PopoverContent align="end" sideOffset={8} className="w-56 p-1">
-              <p className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
-                {t("header.switchStaff")}
-              </p>
-              <Separator className="my-1" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" sideOffset={8}>
+              <DropdownMenuLabel>スタッフ切替</DropdownMenuLabel>
+              <DropdownMenuSeparator />
               {allStaff.map((s) => (
-                <button
+                <DropdownMenuItem
                   key={s.id}
-                  type="button"
                   onClick={() => switchStaff(s)}
-                  className={cn(
-                    "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground",
-                    s.id === staff?.id && "bg-accent/50"
-                  )}
+                  className="gap-2"
                 >
-                  {s.id === staff?.id ? (
-                    <Check className="size-3.5 shrink-0" />
-                  ) : (
-                    <span className="w-3.5" />
-                  )}
-                  <span className="flex-1 text-left">{s.name || t("analytics.noName")}</span>
-                  <span className="text-xs text-muted-foreground">{s.role}</span>
-                </button>
+                  {s.id === staff?.id && <Check className="size-3.5" />}
+                  {s.id !== staff?.id && <span className="w-3.5" />}
+                  <span>{s.name}</span>
+                  <span className="ml-auto text-xs text-muted-foreground">
+                    {s.role}
+                  </span>
+                </DropdownMenuItem>
               ))}
-            </PopoverContent>
-          </Popover>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
 
-        <Popover open={profileOpen} onOpenChange={setProfileOpen}>
-          <PopoverTrigger
+        <DropdownMenu>
+          <DropdownMenuTrigger
             render={
               <Button
-                type="button"
                 variant="ghost"
                 size="icon"
                 className="rounded-full ml-1"
@@ -280,33 +257,30 @@ export function Header({ children }: HeaderProps) {
               {staff?.avatar_url && <AvatarImage src={staff.avatar_url} />}
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
-          </PopoverTrigger>
-          <PopoverContent align="end" sideOffset={8} className="w-56 p-1">
-            <div className="flex flex-col gap-0.5 px-2 py-1.5">
-              <span className="text-sm font-medium">{staff?.name ?? "User"}</span>
-              <span className="text-xs text-muted-foreground">
-                {staff?.email ?? ""}
-              </span>
-            </div>
-            <Separator className="my-1" />
-            <button
-              type="button"
-              className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
-            >
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" sideOffset={8}>
+            <DropdownMenuLabel>
+              <div className="flex flex-col gap-0.5 py-1">
+                <span className="text-sm font-medium">
+                  {staff?.name ?? "User"}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {staff?.email ?? ""}
+                </span>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
               <User className="size-4" />
               <span>{t("auth.profile")}</span>
-            </button>
-            <Separator className="my-1" />
-            <button
-              type="button"
-              onClick={doLogout}
-              className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
-            >
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => void logout()}>
               <LogOut className="size-4" />
               <span>{t("auth.logout")}</span>
-            </button>
-          </PopoverContent>
-        </Popover>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );

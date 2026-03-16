@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useI18n } from "@/lib/i18n/context";
 import { useAuthStore } from "@/stores/auth-store";
 import { getTodayAppointments } from "@/features/recording/api";
 import { RecordingControls } from "@/features/recording/components/recording-controls";
@@ -26,7 +25,6 @@ type AppointmentWithCustomer = Tables<"appointments"> & {
 };
 
 function RecordingPageContent() {
-  const { t } = useI18n();
   const searchParams = useSearchParams();
   const router = useRouter();
   const staff = useAuthStore((s) => s.staff);
@@ -48,11 +46,11 @@ function RecordingPageContent() {
       const data = await getTodayAppointments(organization.id, staff.id);
       setAppointments(data);
     } catch {
-      toast.error(t("recording.loadFailed"));
+      toast.error("予約の読み込みに失敗しました");
     } finally {
       setIsLoading(false);
     }
-  }, [organization, staff, t]);
+  }, [organization, staff]);
 
   useEffect(() => {
     if (!customerId) {
@@ -129,9 +127,9 @@ function RecordingPageContent() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">{t("recording.title")}</h1>
+        <h1 className="text-2xl font-bold tracking-tight">録音</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {t("recording.subtitle")}
+          お客様を選択して録音を開始します
         </p>
       </div>
 
@@ -147,9 +145,9 @@ function RecordingPageContent() {
                 <Mic className="h-8 w-8 text-muted-foreground" />
               </div>
               <div className="text-center">
-                <p className="font-medium">{t("recording.noAppointmentsToday")}</p>
+                <p className="font-medium">本日の予約はありません</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {t("recording.noAppointmentsHint")}
+                  予約が入ると、ここに表示されます
                 </p>
               </div>
             </div>
@@ -168,11 +166,11 @@ function RecordingPageContent() {
                     <div className="min-w-0 flex-1">
                       <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
                         {activeAppointment.type === "current"
-                          ? t("recording.currentAppointment")
-                          : t("recording.nextAppointmentLabel")}
+                          ? "現在の予約"
+                          : "次の予約"}
                       </span>
                       <p className="mt-2 truncate text-lg font-bold">
-                        {activeAppointment.appointment.customers?.name ?? t("common.unknown")}
+                        {activeAppointment.appointment.customers?.name ?? "不明"}
                       </p>
                       <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
                         <Clock className="h-3.5 w-3.5" />
@@ -203,7 +201,7 @@ function RecordingPageContent() {
                       }
                     >
                       <Mic className="h-5 w-5" />
-                      {t("recording.start")}
+                      録音開始
                     </Button>
                   </div>
                 </CardContent>
@@ -234,7 +232,7 @@ function RecordingPageContent() {
                       </div>
                       <div className="min-w-0 flex-1">
                         <CardTitle>
-                          {appt.customers?.name ?? t("common.unknown")}
+                          {appt.customers?.name ?? "不明"}
                         </CardTitle>
                         <CardDescription className="flex items-center gap-1.5">
                           <Clock className="h-3.5 w-3.5" />

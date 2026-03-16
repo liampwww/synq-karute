@@ -45,14 +45,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="ja"
-      suppressHydrationWarning
-      data-ui-density="relaxed"
-      data-card-elevation="elevated"
-      data-colorful="false"
-      data-subtle-color="false"
-    >
+    <html lang="ja" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

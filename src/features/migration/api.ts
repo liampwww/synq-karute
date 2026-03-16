@@ -1,25 +1,5 @@
 import type { FieldMapping, DedupStrategy, AnalysisResult, MigrationProgress } from "@/lib/migration/types";
 
-export async function fetchFromApi(
-  url: string,
-  orgId: string,
-  staffId: string,
-  headers?: Record<string, string>
-): Promise<{ jobId: string; analysis: AnalysisResult }> {
-  const res = await fetch("/api/migration/fetch-from-api", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ url, orgId, staffId, headers }),
-  });
-
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error || "API fetch failed");
-  }
-
-  return res.json();
-}
-
 export async function uploadMigrationFile(
   file: File,
   orgId: string,

@@ -14,27 +14,47 @@ const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
-async function createStorageBucket() {
-  console.log("Creating 'recordings' storage bucket...");
-
+async function createStorageBuckets() {
   const { data: buckets } = await supabase.storage.listBuckets();
-  const exists = buckets?.some((b) => b.name === "recordings");
+  const bucketNames = buckets?.map((b) => b.name) ?? [];
 
-  if (exists) {
+  if (!bucketNames.includes("recordings")) {
+    console.log("Creating 'recordings' storage bucket...");
+    const { error } = await supabase.storage.createBucket("recordings", {
+      public: false,
+      fileSizeLimit: 104857600,
+      allowedMimeTypes: ["audio/webm", "audio/mp4", "audio/wav", "audio/ogg"],
+    });
+    if (error) {
+      console.error("  Failed to create bucket:", error.message);
+    } else {
+      console.log("  Bucket 'recordings' created successfully.");
+    }
+  } else {
     console.log("  Bucket 'recordings' already exists.");
-    return;
   }
 
-  const { error } = await supabase.storage.createBucket("recordings", {
-    public: false,
-    fileSizeLimit: 104857600,
-    allowedMimeTypes: ["audio/webm", "audio/mp4", "audio/wav", "audio/ogg"],
-  });
-
-  if (error) {
-    console.error("  Failed to create bucket:", error.message);
+  if (!bucketNames.includes("migrations")) {
+    console.log("Creating 'migrations' storage bucket...");
+    const { error } = await supabase.storage.createBucket("migrations", {
+      public: false,
+      fileSizeLimit: 104857600,
+      allowedMimeTypes: [
+        "text/csv",
+        "text/plain",
+        "application/json",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.ms-excel",
+        "application/octet-stream",
+      ],
+    });
+    if (error) {
+      console.error("  Failed to create bucket:", error.message);
+    } else {
+      console.log("  Bucket 'migrations' created successfully.");
+    }
   } else {
-    console.log("  Bucket 'recordings' created successfully.");
+    console.log("  Bucket 'migrations' already exists.");
   }
 }
 
@@ -137,7 +157,7 @@ async function seedOrganizationAndStaff(userId) {
 async function main() {
   console.log("=== SYNQ Karute Setup ===\n");
 
-  await createStorageBucket();
+  await createStorageBuckets();
   console.log();
 
   const user = await createTestUser();

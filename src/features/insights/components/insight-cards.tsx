@@ -20,8 +20,6 @@ import {
 } from "lucide-react";
 
 import type { Tables, InsightType } from "@/types/database";
-import { useI18n } from "@/lib/i18n/context";
-import { TranslatedText } from "@/components/translated-text";
 import { useAuthStore } from "@/stores/auth-store";
 import {
   getInsights,
@@ -34,19 +32,19 @@ import { Badge } from "@/components/ui/badge";
 
 const INSIGHT_TYPE_CONFIG: Record<
   InsightType,
-  { icon: typeof Lightbulb; labelKey: string; color: string }
+  { icon: typeof Lightbulb; label: string; color: string }
 > = {
-  next_treatment: { icon: ArrowRight, labelKey: "next_treatment", color: "text-blue-500" },
-  follow_up: { icon: Clock, labelKey: "follow_up", color: "text-green-500" },
-  reactivation: { icon: UserCheck, labelKey: "reactivation", color: "text-orange-500" },
-  churn_risk: { icon: AlertTriangle, labelKey: "churn_risk", color: "text-red-500" },
-  unresolved_issue: { icon: AlertTriangle, labelKey: "unresolved_issue", color: "text-yellow-500" },
-  talking_point: { icon: MessageCircle, labelKey: "talking_point", color: "text-purple-500" },
-  upsell: { icon: TrendingUp, labelKey: "upsell", color: "text-emerald-500" },
-  photo_request: { icon: Camera, labelKey: "photo_request", color: "text-pink-500" },
-  plan_incomplete: { icon: Clock, labelKey: "plan_incomplete", color: "text-amber-500" },
-  high_value: { icon: Star, labelKey: "high_value", color: "text-yellow-500" },
-  general: { icon: Lightbulb, labelKey: "general", color: "text-gray-500" },
+  next_treatment: { icon: ArrowRight, label: "次回施術", color: "text-blue-500" },
+  follow_up: { icon: Clock, label: "フォローアップ", color: "text-green-500" },
+  reactivation: { icon: UserCheck, label: "再来店促進", color: "text-orange-500" },
+  churn_risk: { icon: AlertTriangle, label: "離脱リスク", color: "text-red-500" },
+  unresolved_issue: { icon: AlertTriangle, label: "未解決課題", color: "text-yellow-500" },
+  talking_point: { icon: MessageCircle, label: "話題", color: "text-purple-500" },
+  upsell: { icon: TrendingUp, label: "アップセル", color: "text-emerald-500" },
+  photo_request: { icon: Camera, label: "写真撮影", color: "text-pink-500" },
+  plan_incomplete: { icon: Clock, label: "計画未完了", color: "text-amber-500" },
+  high_value: { icon: Star, label: "VIP", color: "text-yellow-500" },
+  general: { icon: Lightbulb, label: "一般", color: "text-gray-500" },
 };
 
 type InsightWithCustomer = Tables<"customer_ai_insights"> & {
@@ -66,7 +64,6 @@ export function InsightCards({
   limit = 10,
   onNavigateToCustomer,
 }: InsightCardsProps) {
-  const { t } = useI18n();
   const organization = useAuthStore((s) => s.organization);
 
   const [insights, setInsights] = useState<InsightWithCustomer[]>([]);
@@ -104,10 +101,10 @@ export function InsightCards({
         organization.id,
         organization.type || "hair"
       );
-      toast.success(`${result.generated}${t("insightCards.generateSuccess")}`);
+      toast.success(`${result.generated} 件のインサイトを生成しました`);
       fetchInsights();
     } catch {
-      toast.error(t("insightCards.generateFailed"));
+      toast.error("インサイトの生成に失敗しました");
     } finally {
       setIsGenerating(false);
     }
@@ -118,7 +115,7 @@ export function InsightCards({
       await updateInsightStatus(id, "dismissed");
       setInsights((prev) => prev.filter((i) => i.id !== id));
     } catch {
-      toast.error(t("insightCards.updateFailed"));
+      toast.error("更新に失敗しました");
     }
   };
 
@@ -126,9 +123,9 @@ export function InsightCards({
     try {
       await updateInsightStatus(id, "actioned");
       setInsights((prev) => prev.filter((i) => i.id !== id));
-      toast.success(t("insightCards.actionMarked"));
+      toast.success("アクション完了としてマーク");
     } catch {
-      toast.error(t("insightCards.updateFailed"));
+      toast.error("更新に失敗しました");
     }
   };
 
@@ -151,7 +148,7 @@ export function InsightCards({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Lightbulb className="size-4 text-amber-500" />
-            <span className="text-sm font-medium">{t("insightCards.title")}</span>
+            <span className="text-sm font-medium">AI推奨アクション</span>
             {insights.length > 0 && (
               <Badge variant="secondary" className="text-xs">
                 {insights.length}
@@ -178,8 +175,8 @@ export function InsightCards({
           <Heart className="size-6 opacity-40" />
           <p className="text-xs">
             {customerId
-              ? t("insightCards.noInsights")
-              : t("insightCards.noActiveInsights")}
+              ? "インサイトはまだありません"
+              : "アクティブなインサイトはありません"}
           </p>
           {customerId && (
             <Button
@@ -188,7 +185,7 @@ export function InsightCards({
               onClick={handleGenerate}
               disabled={isGenerating}
             >
-              {isGenerating ? t("insightCards.generating") : t("insightCards.runAnalysis")}
+              {isGenerating ? "生成中..." : "AI分析を実行"}
             </Button>
           )}
         </div>
@@ -215,13 +212,13 @@ export function InsightCards({
                     <div className="space-y-0.5">
                       <div className="flex items-center gap-2">
                         <h4 className="text-sm font-medium">
-                          <TranslatedText text={insight.title} as="span" />
+                          {insight.title}
                         </h4>
                         <Badge
                           variant="outline"
                           className="text-[10px] px-1.5 py-0"
                         >
-                          {t(`insightCards.types.${config.labelKey}`)}
+                          {config.label}
                         </Badge>
                       </div>
                       {showCustomerName && insight.customers && (
@@ -243,7 +240,7 @@ export function InsightCards({
                       size="icon"
                       className="size-7"
                       onClick={() => handleAction(insight.id)}
-                      title={t("insightCards.complete")}
+                      title="完了"
                     >
                       <Check className="size-3.5 text-green-500" />
                     </Button>
@@ -252,7 +249,7 @@ export function InsightCards({
                       size="icon"
                       className="size-7"
                       onClick={() => handleDismiss(insight.id)}
-                      title={t("insightCards.dismiss")}
+                      title="非表示"
                     >
                       <X className="size-3.5 text-muted-foreground" />
                     </Button>
@@ -260,7 +257,7 @@ export function InsightCards({
                 </div>
 
                 <p className="text-sm text-muted-foreground leading-relaxed pl-9">
-                  <TranslatedText text={insight.description} as="span" />
+                  {insight.description}
                 </p>
 
                 {insight.priority_score >= 0.8 && (
@@ -269,7 +266,7 @@ export function InsightCards({
                       variant="destructive"
                       className="text-[10px] px-1.5 py-0"
                     >
-                      {t("insightCards.highPriority")}
+                      優先度高
                     </Badge>
                   </div>
                 )}
