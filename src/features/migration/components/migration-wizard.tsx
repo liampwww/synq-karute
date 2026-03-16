@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Database, Upload, Settings, Play } from "lucide-react";
+import { ArrowLeft, Database, Upload, Settings, Play, Plug, Monitor, FileSpreadsheet } from "lucide-react";
 
 import { useI18n } from "@/lib/i18n/context";
 import type {
@@ -14,10 +14,13 @@ import { useAuthStore } from "@/stores/auth-store";
 import { uploadMigrationFile, confirmMigration } from "@/features/migration/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileUploader } from "./file-uploader";
+import { ApiConnectorForm } from "./api-connector-form";
+import { BrowserAssistPaste } from "./browser-assist-paste";
 import { MappingEditor } from "./mapping-editor";
 import { MigrationProgress } from "./migration-progress";
 
 type WizardStep = "upload" | "mapping" | "importing" | "done";
+type ImportSource = "file" | "api" | "browser";
 
 const STEP_CONFIG = [
   { key: "upload" as const, labelKey: "fileSelect", icon: Upload },
@@ -25,12 +28,31 @@ const STEP_CONFIG = [
   { key: "importing" as const, labelKey: "import", icon: Play },
 ];
 
-export function MigrationWizard() {
+const SOURCE_OPTIONS: { id: ImportSource; icon: typeof FileSpreadsheet; labelKey: string }[] = [
+  { id: "file", icon: FileSpreadsheet, labelKey: "importSourceFile" },
+  { id: "api", icon: Plug, labelKey: "importSourceApi" },
+  { id: "browser", icon: Monitor, labelKey: "importSourceBrowser" },
+];
+
+interface MigrationWizardProps {
+  initialSource?: "file" | "api" | "browser" | null;
+  onSourceConsumed?: () => void;
+}
+
+export function MigrationWizard({ initialSource, onSourceConsumed }: MigrationWizardProps) {
   const { t } = useI18n();
   const organization = useAuthStore((s) => s.organization);
   const activeStaff = useAuthStore((s) => s.staff);
 
   const [step, setStep] = useState<WizardStep>("upload");
+  const [importSource, setImportSource] = useState<ImportSource>("file");
+
+  useEffect(() => {
+    if (initialSource && ["file", "api", "browser"].includes(initialSource)) {
+      setImportSource(initialSource);
+      onSourceConsumed?.();
+    }
+  }, [initialSource, onSourceConsumed]);
   const [isUploading, setIsUploading] = useState(false);
   const [jobId, setJobId] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
@@ -128,23 +150,70 @@ export function MigrationWizard() {
       </div>
 
       {step === "upload" && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Database className="size-5" />
-              {t("migration.dataImport")}
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">
-              {t("migration.dataImportDesc")}
-            </p>
-          </CardHeader>
-          <CardContent>
-            <FileUploader
-              onFileSelected={handleFileSelected}
-              isUploading={isUploading}
+        <div className="space-y-4">
+          <div className="flex gap-2 p-1 rounded-lg border bg-muted/30 w-fit">
+            {SOURCE_OPTIONS.map((opt) => {
+              const Icon = opt.icon;
+              const isActive = importSource === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setImportSource(opt.id)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActive
+                      ? "bg-background shadow-sm border"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Icon className="size-4" />
+                  {t(`migration.${opt.labelKey}`)}
+                </button>
+              );
+            })}
+          </div>
+          {importSource === "file" && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Database className="size-5" />
+                  {t("migration.dataImport")}
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  {t("migration.dataImportDesc")}
+                </p>
+              </CardHeader>
+              <CardContent>
+                <FileUploader
+                  onFileSelected={handleFileSelected}
+                  isUploading={isUploading}
+                />
+              </CardContent>
+            </Card>
+          )}
+          {importSource === "api" && (
+            <ApiConnectorForm
+              onSuccess={(id, a) => {
+                setJobId(id);
+                setAnalysis(a);
+                setStep("mapping");
+                toast.success(`${a.totalRows}${t("migration.recordsDetected")}`);
+              }}
             />
-          </CardContent>
-        </Card>
+          )}
+          {importSource === "browser" && (
+            <BrowserAssistPaste
+              onSuccess={(id, a) => {
+                setJobId(id);
+                setAnalysis(a);
+                setStep("mapping");
+                toast.success(`${a.totalRows}${t("migration.recordsDetected")}`);
+              }}
+              isUploading={isUploading}
+              setIsUploading={setIsUploading}
+            />
+          )}
+        </div>
       )}
 
       {step === "mapping" && analysis && (
