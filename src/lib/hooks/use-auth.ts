@@ -38,8 +38,6 @@ export function useAuth() {
 
         const typedStaff = staffRow as Tables<"staff"> | null;
         if (typedStaff) {
-          store.setStaff(typedStaff);
-
           const { data: orgRow } = await supabase
             .from("organizations")
             .select("*")
@@ -48,6 +46,26 @@ export function useAuth() {
 
           if (orgRow) {
             store.setOrganization(orgRow as Tables<"organizations">);
+          }
+
+          const lastStaffId =
+            typeof window !== "undefined"
+              ? localStorage.getItem("synq-karute-selected-staff-id")
+              : null;
+          if (lastStaffId && lastStaffId !== typedStaff.id) {
+            const { data: lastStaff } = await supabase
+              .from("staff")
+              .select("*")
+              .eq("id", lastStaffId)
+              .eq("org_id", typedStaff.org_id)
+              .single();
+            if (lastStaff) {
+              store.setStaff(lastStaff as Tables<"staff">);
+            } else {
+              store.setStaff(typedStaff);
+            }
+          } else {
+            store.setStaff(typedStaff);
           }
         }
       } catch {

@@ -201,8 +201,14 @@ export function RecordingControls({
         `カルテを作成しました（${result.entryCount}件の情報を抽出）`,
         { id: "pipeline" }
       );
-    } catch {
-      toast.error("録音の保存に失敗しました");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("Recording save failed:", err);
+      toast.error(
+        msg.includes("bucket") || msg.includes("Bucket")
+          ? "録音用のストレージが設定されていません。SupabaseのSQLを実行してください。"
+          : `録音の保存に失敗しました: ${msg.slice(0, 80)}`
+      );
       if (recordingId) {
         await updateRecordingSession(recordingId, {
           status: "failed",

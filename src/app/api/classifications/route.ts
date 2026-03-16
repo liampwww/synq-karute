@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { classifyTranscript } from "@/lib/ai/classifier";
 import { createClient } from "@/lib/supabase/server";
+import { calculateCustomerInsights } from "@/lib/insights/calculate-customer-insights";
+import { sendOutboundWebhook } from "@/lib/webhooks/send-outbound";
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,10 +42,6 @@ export async function POST(request: NextRequest) {
     const typedSegments = segments as { content: string }[];
     const transcript = typedSegments.map((seg) => seg.content).join("\n");
 
-    const classification = await classifyTranscript(transcript, {
-      businessType: businessType ?? "hair",
-    });
-
     const { data: recording, error: recordingError } = await supabase
       .from("recording_sessions")
       .select("customer_id, staff_id, org_id, appointment_id")
@@ -64,6 +62,25 @@ export async function POST(request: NextRequest) {
       appointment_id: string | null;
     };
 
+    const { data: pastKarutes } = await supabase
+      .from("karute_records")
+      .select("ai_summary, created_at")
+      .eq("customer_id", rec.customer_id)
+      .order("created_at", { ascending: false })
+      .limit(5);
+
+    const customerHistory = (pastKarutes ?? [])
+      .filter((k) => k.ai_summary)
+      .map((k) => ({
+        summary: k.ai_summary as string,
+        date: new Date(k.created_at).toISOString().slice(0, 10),
+      }));
+
+    const classification = await classifyTranscript(transcript, {
+      businessType: businessType ?? "hair",
+      customerHistory,
+    });
+
     const { data: karuteRecord, error: karuteError } = await supabase
       .from("karute_records")
       .insert({
@@ -73,6 +90,7 @@ export async function POST(request: NextRequest) {
         appointment_id: rec.appointment_id,
         org_id: rec.org_id,
         ai_summary: classification.summary,
+        staff_advice: classification.staffAdvice ?? null,
         business_type: businessType ?? "hair",
         status: "draft",
       })
@@ -128,6 +146,31 @@ export async function POST(request: NextRequest) {
       linked_record_id: kr.id,
       linked_record_type: "karute",
     });
+
+    try {
+      await calculateCustomerInsights(supabase, rec.customer_id, rec.org_id);
+    } catch {
+      // Non-fatal: insights recalc can fail without breaking the flow
+    }
+
+    try {
+      await sendOutboundWebhook(supabase, rec.org_id, {
+        type: "karute.created",
+        payload: {
+          karute_id: kr.id,
+          customer_id: rec.customer_id,
+          org_id: rec.org_id,
+          staff_id: rec.staff_id,
+          appointment_id: rec.appointment_id,
+          summary: classification.summary ?? null,
+          staff_advice: classification.staffAdvice ?? null,
+          entry_count: classification.entries.length,
+          created_at: new Date().toISOString(),
+        },
+      });
+    } catch {
+      // Non-fatal: webhook delivery can fail without breaking the flow
+    }
 
     return NextResponse.json({
       karuteId: kr.id,

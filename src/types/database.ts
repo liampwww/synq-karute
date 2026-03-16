@@ -387,6 +387,7 @@ export interface Database {
           appointment_id: string | null;
           org_id: string;
           ai_summary: string | null;
+          staff_advice: string | null;
           business_type: string;
           status: KarteStatus;
           created_at: string;
@@ -400,6 +401,7 @@ export interface Database {
           appointment_id?: string | null;
           org_id: string;
           ai_summary?: string | null;
+          staff_advice?: string | null;
           business_type?: string;
           status?: KarteStatus;
           created_at?: string;
@@ -716,6 +718,135 @@ export interface Database {
           }
         ];
       };
+      customer_insights: {
+        Row: {
+          id: string;
+          customer_id: string;
+          org_id: string;
+          total_visits: number;
+          total_spend: number;
+          ltv: number;
+          avg_session_duration: string | null;
+          top_pro_topics: Json | null;
+          top_personal_topics: Json | null;
+          recurring_themes: Json | null;
+          trend_analysis: Json | null;
+          last_calculated_at: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          customer_id: string;
+          org_id: string;
+          total_visits?: number;
+          total_spend?: number;
+          ltv?: number;
+          avg_session_duration?: string | null;
+          top_pro_topics?: Json | null;
+          top_personal_topics?: Json | null;
+          recurring_themes?: Json | null;
+          trend_analysis?: Json | null;
+          last_calculated_at?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          customer_id?: string;
+          org_id?: string;
+          total_visits?: number;
+          total_spend?: number;
+          ltv?: number;
+          avg_session_duration?: string | null;
+          top_pro_topics?: Json | null;
+          top_personal_topics?: Json | null;
+          recurring_themes?: Json | null;
+          trend_analysis?: Json | null;
+          last_calculated_at?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "customer_insights_customer_id_fkey";
+            columns: ["customer_id"];
+            isOneToOne: true;
+            referencedRelation: "customers";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "customer_insights_org_id_fkey";
+            columns: ["org_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      staff_analytics: {
+        Row: {
+          id: string;
+          staff_id: string;
+          org_id: string;
+          period_start: string;
+          period_end: string;
+          total_sessions: number;
+          avg_confidence: number;
+          talk_ratio: Json | null;
+          top_topics: Json | null;
+          customer_satisfaction_indicators: Json | null;
+          repeat_rate: number;
+          revenue_attributed: number;
+          ai_coaching_notes: string | null;
+          calculated_at: string;
+        };
+        Insert: {
+          id?: string;
+          staff_id: string;
+          org_id: string;
+          period_start: string;
+          period_end: string;
+          total_sessions?: number;
+          avg_confidence?: number;
+          talk_ratio?: Json | null;
+          top_topics?: Json | null;
+          customer_satisfaction_indicators?: Json | null;
+          repeat_rate?: number;
+          revenue_attributed?: number;
+          ai_coaching_notes?: string | null;
+          calculated_at?: string;
+        };
+        Update: {
+          id?: string;
+          staff_id?: string;
+          org_id?: string;
+          period_start?: string;
+          period_end?: string;
+          total_sessions?: number;
+          avg_confidence?: number;
+          talk_ratio?: Json | null;
+          top_topics?: Json | null;
+          customer_satisfaction_indicators?: Json | null;
+          repeat_rate?: number;
+          revenue_attributed?: number;
+          ai_coaching_notes?: string | null;
+          calculated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "staff_analytics_staff_id_fkey";
+            columns: ["staff_id"];
+            isOneToOne: false;
+            referencedRelation: "staff";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "staff_analytics_org_id_fkey";
+            columns: ["org_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       migration_records: {
         Row: {
           id: string;
@@ -755,6 +886,52 @@ export interface Database {
             columns: ["job_id"];
             isOneToOne: false;
             referencedRelation: "migration_jobs";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      webhook_logs: {
+        Row: {
+          id: string;
+          org_id: string;
+          event_type: string;
+          url: string;
+          payload: Json;
+          attempt: number;
+          status: number | null;
+          response: string | null;
+          error: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          org_id: string;
+          event_type: string;
+          url: string;
+          payload?: Json;
+          attempt?: number;
+          status?: number | null;
+          response?: string | null;
+          error?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          org_id?: string;
+          event_type?: string;
+          url?: string;
+          payload?: Json;
+          attempt?: number;
+          status?: number | null;
+          response?: string | null;
+          error?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "webhook_logs_org_id_fkey";
+            columns: ["org_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
             referencedColumns: ["id"];
           }
         ];

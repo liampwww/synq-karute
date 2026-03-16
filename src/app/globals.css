@@ -134,6 +134,292 @@
   }
 }
 
+/* Appearance: UI density & card elevation */
+[data-ui-density="compact"] .app-content {
+  padding: 0.75rem;
+}
+@media (min-width: 1024px) {
+  [data-ui-density="compact"] .app-content {
+    padding: 1rem;
+  }
+}
+
+[data-ui-density="relaxed"] .app-content {
+  padding: 1rem;
+}
+@media (min-width: 1024px) {
+  [data-ui-density="relaxed"] .app-content {
+    padding: 1.5rem;
+  }
+}
+
+[data-ui-density="spacious"] .app-content {
+  padding: 1.5rem;
+}
+@media (min-width: 1024px) {
+  [data-ui-density="spacious"] .app-content {
+    padding: 2rem;
+  }
+}
+
+[data-card-elevation="elevated"] [data-slot="card"] {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+}
+
+/* Soft color mode: visible but refined tints — you can tell the difference */
+[data-subtle-color="true"] [data-page="dashboard"] [data-slot="card"] {
+  background: linear-gradient(165deg, oklch(0.96 0.025 250) 0%, oklch(0.98 0.01 250) 100%) !important;
+  border-color: oklch(0.88 0.03 250 / 0.5);
+}
+[data-subtle-color="true"] [data-page="customers"] [data-slot="card"] {
+  background: linear-gradient(165deg, oklch(0.96 0.03 295) 0%, oklch(0.98 0.012 295) 100%) !important;
+  border-color: oklch(0.88 0.035 295 / 0.5);
+}
+[data-subtle-color="true"] [data-page="appointments"] [data-slot="card"] {
+  background: linear-gradient(165deg, oklch(0.97 0.035 75) 0%, oklch(0.98 0.015 75) 100%) !important;
+  border-color: oklch(0.9 0.03 75 / 0.5);
+}
+[data-subtle-color="true"] [data-page="karute"] [data-slot="card"] {
+  background: linear-gradient(165deg, oklch(0.96 0.03 155) 0%, oklch(0.98 0.012 155) 100%) !important;
+  border-color: oklch(0.88 0.035 155 / 0.5);
+}
+[data-subtle-color="true"] [data-page="recording"] [data-slot="card"] {
+  background: linear-gradient(165deg, oklch(0.97 0.035 15) 0%, oklch(0.98 0.015 15) 100%) !important;
+  border-color: oklch(0.9 0.035 15 / 0.5);
+}
+[data-subtle-color="true"] [data-page="analytics"] [data-slot="card"] {
+  background: linear-gradient(165deg, oklch(0.96 0.028 265) 0%, oklch(0.98 0.012 265) 100%) !important;
+  border-color: oklch(0.88 0.03 265 / 0.5);
+}
+[data-subtle-color="true"] [data-page="askAi"] [data-slot="card"] {
+  background: linear-gradient(165deg, oklch(0.96 0.03 200) 0%, oklch(0.98 0.012 200) 100%) !important;
+  border-color: oklch(0.88 0.035 200 / 0.5);
+}
+[data-subtle-color="true"] [data-page="migration"] [data-slot="card"],
+[data-subtle-color="true"] [data-page="settings"] [data-slot="card"],
+[data-subtle-color="true"] [data-page="default"] [data-slot="card"] {
+  background: linear-gradient(165deg, oklch(0.97 0.015 260) 0%, oklch(0.98 0.008 260) 100%) !important;
+  border-color: oklch(0.9 0.02 260 / 0.5);
+}
+
+.dark [data-subtle-color="true"] [data-page="dashboard"] [data-slot="card"] {
+  background: linear-gradient(165deg, oklch(0.24 0.04 250) 0%, oklch(0.2 0.02 250) 100%) !important;
+  border-color: oklch(0.4 0.05 250 / 0.4);
+}
+.dark [data-subtle-color="true"] [data-page="customers"] [data-slot="card"] {
+  background: linear-gradient(165deg, oklch(0.24 0.045 295) 0%, oklch(0.2 0.02 295) 100%) !important;
+  border-color: oklch(0.4 0.055 295 / 0.4);
+}
+.dark [data-subtle-color="true"] [data-page="appointments"] [data-slot="card"] {
+  background: linear-gradient(165deg, oklch(0.25 0.04 75) 0%, oklch(0.2 0.02 75) 100%) !important;
+  border-color: oklch(0.42 0.045 75 / 0.4);
+}
+.dark [data-subtle-color="true"] [data-page="karute"] [data-slot="card"] {
+  background: linear-gradient(165deg, oklch(0.23 0.045 155) 0%, oklch(0.2 0.02 155) 100%) !important;
+  border-color: oklch(0.4 0.055 155 / 0.4);
+}
+.dark [data-subtle-color="true"] [data-page="recording"] [data-slot="card"] {
+  background: linear-gradient(165deg, oklch(0.25 0.045 15) 0%, oklch(0.2 0.02 15) 100%) !important;
+  border-color: oklch(0.42 0.05 15 / 0.4);
+}
+.dark [data-subtle-color="true"] [data-page="analytics"] [data-slot="card"] {
+  background: linear-gradient(165deg, oklch(0.24 0.04 265) 0%, oklch(0.2 0.02 265) 100%) !important;
+  border-color: oklch(0.4 0.05 265 / 0.4);
+}
+.dark [data-subtle-color="true"] [data-page="askAi"] [data-slot="card"] {
+  background: linear-gradient(165deg, oklch(0.23 0.04 200) 0%, oklch(0.2 0.02 200) 100%) !important;
+  border-color: oklch(0.4 0.05 200 / 0.4);
+}
+.dark [data-subtle-color="true"] [data-page="migration"] [data-slot="card"],
+.dark [data-subtle-color="true"] [data-page="settings"] [data-slot="card"],
+.dark [data-subtle-color="true"] [data-page="default"] [data-slot="card"] {
+  background: linear-gradient(165deg, oklch(0.23 0.03 260) 0%, oklch(0.2 0.015 260) 100%) !important;
+  border-color: oklch(0.38 0.04 260 / 0.4);
+}
+
+/* Soft color mode: analytics stat cards — clearly distinct */
+[data-subtle-color="true"] [data-page="analytics"] .stat-card-1 {
+  background: linear-gradient(165deg, oklch(0.94 0.04 250) 0%, oklch(0.97 0.02 250) 100%) !important;
+  border-color: oklch(0.85 0.05 250 / 0.6);
+}
+[data-subtle-color="true"] [data-page="analytics"] .stat-card-2 {
+  background: linear-gradient(165deg, oklch(0.94 0.045 160) 0%, oklch(0.97 0.02 160) 100%) !important;
+  border-color: oklch(0.85 0.05 160 / 0.6);
+}
+[data-subtle-color="true"] [data-page="analytics"] .stat-card-3 {
+  background: linear-gradient(165deg, oklch(0.95 0.04 295) 0%, oklch(0.97 0.02 295) 100%) !important;
+  border-color: oklch(0.86 0.05 295 / 0.6);
+}
+[data-subtle-color="true"] [data-page="analytics"] .stat-card-4 {
+  background: linear-gradient(165deg, oklch(0.96 0.04 75) 0%, oklch(0.97 0.02 75) 100%) !important;
+  border-color: oklch(0.88 0.04 75 / 0.6);
+}
+.dark [data-subtle-color="true"] [data-page="analytics"] .stat-card-1 {
+  background: linear-gradient(165deg, oklch(0.26 0.055 250) 0%, oklch(0.22 0.03 250) 100%) !important;
+  border-color: oklch(0.45 0.06 250 / 0.5);
+}
+.dark [data-subtle-color="true"] [data-page="analytics"] .stat-card-2 {
+  background: linear-gradient(165deg, oklch(0.255 0.06 160) 0%, oklch(0.22 0.03 160) 100%) !important;
+  border-color: oklch(0.45 0.065 160 / 0.5);
+}
+.dark [data-subtle-color="true"] [data-page="analytics"] .stat-card-3 {
+  background: linear-gradient(165deg, oklch(0.26 0.055 295) 0%, oklch(0.22 0.03 295) 100%) !important;
+  border-color: oklch(0.45 0.06 295 / 0.5);
+}
+.dark [data-subtle-color="true"] [data-page="analytics"] .stat-card-4 {
+  background: linear-gradient(165deg, oklch(0.27 0.055 75) 0%, oklch(0.22 0.03 75) 100%) !important;
+  border-color: oklch(0.48 0.055 75 / 0.5);
+}
+.dark [data-card-elevation="elevated"] [data-slot="card"] {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.2), 0 2px 4px -2px rgb(0 0 0 / 0.15);
+}
+
+/* Colorful mode: vibrant accents across the app */
+[data-colorful="true"] [data-nav-key="dashboard"][data-active="true"] {
+  background: oklch(0.9 0.08 250 / 0.5) !important;
+  color: oklch(0.35 0.15 250) !important;
+  border-left: 3px solid oklch(0.55 0.2 250);
+}
+[data-colorful="true"] [data-nav-key="customers"][data-active="true"] {
+  background: oklch(0.92 0.1 300 / 0.5) !important;
+  color: oklch(0.45 0.18 300) !important;
+  border-left: 3px solid oklch(0.55 0.22 300);
+}
+[data-colorful="true"] [data-nav-key="appointments"][data-active="true"] {
+  background: oklch(0.95 0.1 85 / 0.5) !important;
+  color: oklch(0.5 0.15 85) !important;
+  border-left: 3px solid oklch(0.65 0.18 85);
+}
+[data-colorful="true"] [data-nav-key="karute"][data-active="true"] {
+  background: oklch(0.9 0.1 160 / 0.5) !important;
+  color: oklch(0.4 0.15 160) !important;
+  border-left: 3px solid oklch(0.55 0.18 160);
+}
+[data-colorful="true"] [data-nav-key="recording"][data-active="true"] {
+  background: oklch(0.92 0.12 25 / 0.5) !important;
+  color: oklch(0.5 0.2 25) !important;
+  border-left: 3px solid oklch(0.6 0.22 25);
+}
+[data-colorful="true"] [data-nav-key="analytics"][data-active="true"] {
+  background: oklch(0.9 0.1 270 / 0.5) !important;
+  color: oklch(0.4 0.18 270) !important;
+  border-left: 3px solid oklch(0.55 0.22 270);
+}
+[data-colorful="true"] [data-nav-key="askAi"][data-active="true"] {
+  background: oklch(0.9 0.08 195 / 0.5) !important;
+  color: oklch(0.4 0.14 195) !important;
+  border-left: 3px solid oklch(0.55 0.18 195);
+}
+[data-colorful="true"] [data-nav-key="migration"][data-active="true"] {
+  background: oklch(0.88 0.04 260 / 0.5) !important;
+  color: oklch(0.45 0.12 260) !important;
+  border-left: 3px solid oklch(0.5 0.15 260);
+}
+[data-colorful="true"] [data-nav-key="settings"][data-active="true"] {
+  background: oklch(0.9 0.02 250 / 0.5) !important;
+  color: oklch(0.4 0.08 250) !important;
+  border-left: 3px solid oklch(0.5 0.1 250);
+}
+
+.dark [data-colorful="true"] [data-nav-key="dashboard"][data-active="true"] {
+  background: oklch(0.3 0.1 250 / 0.4) !important;
+  color: oklch(0.85 0.08 250) !important;
+  border-left-color: oklch(0.65 0.2 250);
+}
+.dark [data-colorful="true"] [data-nav-key="customers"][data-active="true"] {
+  background: oklch(0.32 0.12 300 / 0.4) !important;
+  color: oklch(0.88 0.1 300) !important;
+  border-left-color: oklch(0.65 0.22 300);
+}
+.dark [data-colorful="true"] [data-nav-key="appointments"][data-active="true"] {
+  background: oklch(0.35 0.1 85 / 0.4) !important;
+  color: oklch(0.9 0.08 85) !important;
+  border-left-color: oklch(0.7 0.18 85);
+}
+.dark [data-colorful="true"] [data-nav-key="karute"][data-active="true"] {
+  background: oklch(0.28 0.1 160 / 0.4) !important;
+  color: oklch(0.85 0.1 160) !important;
+  border-left-color: oklch(0.6 0.18 160);
+}
+.dark [data-colorful="true"] [data-nav-key="recording"][data-active="true"] {
+  background: oklch(0.35 0.12 25 / 0.4) !important;
+  color: oklch(0.9 0.1 25) !important;
+  border-left-color: oklch(0.65 0.22 25);
+}
+.dark [data-colorful="true"] [data-nav-key="analytics"][data-active="true"] {
+  background: oklch(0.3 0.1 270 / 0.4) !important;
+  color: oklch(0.88 0.1 270) !important;
+  border-left-color: oklch(0.65 0.22 270);
+}
+.dark [data-colorful="true"] [data-nav-key="askAi"][data-active="true"] {
+  background: oklch(0.28 0.08 195 / 0.4) !important;
+  color: oklch(0.85 0.08 195) !important;
+  border-left-color: oklch(0.6 0.18 195);
+}
+.dark [data-colorful="true"] [data-nav-key="migration"][data-active="true"] {
+  background: oklch(0.3 0.06 260 / 0.4) !important;
+  color: oklch(0.85 0.06 260) !important;
+  border-left-color: oklch(0.55 0.15 260);
+}
+.dark [data-colorful="true"] [data-nav-key="settings"][data-active="true"] {
+  background: oklch(0.32 0.04 250 / 0.4) !important;
+  color: oklch(0.85 0.04 250) !important;
+  border-left-color: oklch(0.55 0.1 250);
+}
+
+/* Colorful mode: cards with left accent border only */
+[data-colorful="true"] [data-slot="card"] {
+  border-left: 4px solid oklch(0.55 0.15 250);
+}
+
+/* Colorful mode: stat cards with distinct left borders */
+[data-colorful="true"] .stat-card-1 {
+  background: oklch(0.92 0.08 250 / 0.6) !important;
+  border-left: 4px solid oklch(0.55 0.2 250);
+}
+[data-colorful="true"] .stat-card-2 {
+  background: oklch(0.92 0.1 160 / 0.6) !important;
+  border-left: 4px solid oklch(0.55 0.18 160);
+}
+[data-colorful="true"] .stat-card-3 {
+  background: oklch(0.95 0.1 300 / 0.6) !important;
+  border-left: 4px solid oklch(0.55 0.22 300);
+}
+[data-colorful="true"] .stat-card-4 {
+  background: oklch(0.95 0.1 85 / 0.6) !important;
+  border-left: 4px solid oklch(0.65 0.18 85);
+}
+.dark [data-colorful="true"] .stat-card-1 {
+  background: oklch(0.28 0.08 250 / 0.5) !important;
+  border-left-color: oklch(0.6 0.2 250);
+}
+.dark [data-colorful="true"] .stat-card-2 {
+  background: oklch(0.25 0.08 160 / 0.5) !important;
+  border-left-color: oklch(0.6 0.18 160);
+}
+.dark [data-colorful="true"] .stat-card-3 {
+  background: oklch(0.28 0.1 300 / 0.5) !important;
+  border-left-color: oklch(0.6 0.22 300);
+}
+.dark [data-colorful="true"] .stat-card-4 {
+  background: oklch(0.3 0.1 85 / 0.5) !important;
+  border-left-color: oklch(0.7 0.18 85);
+}
+
+/* Colorful mode: primary buttons */
+[data-colorful="true"] [data-slot="button"][data-variant="default"] {
+  background: oklch(0.45 0.18 250) !important;
+  color: white !important;
+}
+[data-colorful="true"] [data-slot="button"][data-variant="default"]:hover {
+  background: oklch(0.4 0.2 250) !important;
+}
+
+/* Colorful mode: sidebar logo */
+[data-colorful="true"] .sidebar-logo {
+  background: linear-gradient(135deg, oklch(0.5 0.2 250), oklch(0.5 0.18 300)) !important;
+}
+
 @layer utilities {
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0px);

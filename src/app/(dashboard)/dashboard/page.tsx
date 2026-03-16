@@ -11,6 +11,7 @@ import {
   Clock,
   ArrowRight,
   UserPlus,
+  BarChart3,
   type LucideIcon,
 } from "lucide-react";
 import { startOfWeek, startOfDay, endOfDay, format } from "date-fns";
@@ -425,7 +426,7 @@ export default function DashboardPage() {
                           KARUTE_STATUS_VARIANT[karute.status] ?? "outline"
                         }
                       >
-                        {karute.status}
+                        {t(`karute.status.${karute.status}`)}
                       </Badge>
                     </div>
                   ))}
@@ -441,19 +442,19 @@ export default function DashboardPage() {
           <CardHeader className="border-b">
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
-                AI推奨アクション
+                {t("dashboard.aiRecommendedActions")}
               </CardTitle>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => router.push("/customers")}
               >
-                <span>顧客一覧</span>
+                <span>{t("dashboard.customerList")}</span>
                 <ArrowRight className="size-3.5" />
               </Button>
             </div>
             <CardDescription>
-              顧客のタイムライン・カルテデータからAIが推奨するアクション
+              {t("dashboard.aiRecommendedActionsDesc")}
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-4">
@@ -494,6 +495,13 @@ export default function DashboardPage() {
               >
                 <FileText className="size-4" />
                 {t("karute.title")}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => router.push("/analytics")}
+              >
+                <BarChart3 className="size-4" />
+                {t("nav.analytics")}
               </Button>
             </div>
           </CardContent>

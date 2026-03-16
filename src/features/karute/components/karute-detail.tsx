@@ -22,6 +22,7 @@ import { toast } from "sonner";
 
 import type { KarteCategory } from "@/types/database";
 import { useI18n } from "@/lib/i18n/context";
+import { TranslatedText } from "@/components/translated-text";
 import {
   getKaruteRecord,
   updateKaruteRecord,
@@ -426,7 +427,23 @@ export function KaruteDetail({ karuteId }: KaruteDetailProps) {
           </CardHeader>
           <CardContent>
             <p className="text-sm leading-relaxed text-foreground/80">
-              {karute.ai_summary}
+              <TranslatedText text={karute.ai_summary} as="span" />
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {karute.staff_advice && (
+        <Card className="border-amber-200 dark:border-amber-800/50 bg-gradient-to-br from-amber-50/50 to-transparent dark:from-amber-950/20">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <Briefcase className="size-4 text-amber-500" />
+              {t("karute.staffAdvice")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm leading-relaxed text-foreground/80">
+              <TranslatedText text={karute.staff_advice} as="span" />
             </p>
           </CardContent>
         </Card>
@@ -480,7 +497,7 @@ export function KaruteDetail({ karuteId }: KaruteDetailProps) {
                           className="text-sm font-semibold"
                           style={{ color: businessTypeConfig.color }}
                         >
-                          職種関連
+                          {t("karute.professional")}
                         </span>
                         <span
                           className="ml-1 text-xs opacity-60"
@@ -508,7 +525,7 @@ export function KaruteDetail({ karuteId }: KaruteDetailProps) {
                             <div key={subcat}>
                               <div className="flex items-center gap-2 px-4 py-2 bg-muted/30 border-b border-border/30">
                                 <span className="text-xs font-medium text-muted-foreground">
-                                  {subcat}
+                                  <TranslatedText text={subcat} as="span" />
                                 </span>
                                 <span className="text-[0.6rem] text-muted-foreground/60">
                                   ({entries.length})
@@ -570,7 +587,7 @@ export function KaruteDetail({ karuteId }: KaruteDetailProps) {
                             PERSONAL_ENTRY_CONFIG.text
                           )}
                         >
-                          個人的な話題
+                          {t("karute.personal")}
                         </span>
                         <span
                           className={cn(
@@ -592,7 +609,7 @@ export function KaruteDetail({ karuteId }: KaruteDetailProps) {
                             <div key={subcat}>
                               <div className="flex items-center gap-2 px-4 py-2 bg-muted/30 border-b border-border/30">
                                 <span className="text-xs font-medium text-muted-foreground">
-                                  {subcat}
+                                  <TranslatedText text={subcat} as="span" />
                                 </span>
                                 <span className="text-[0.6rem] text-muted-foreground/60">
                                   ({entries.length})
@@ -921,12 +938,14 @@ function EntryRow({
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1 space-y-1.5">
-                <p className="text-sm">{entry.content}</p>
+                <p className="text-sm">
+                  <TranslatedText text={entry.content} as="span" />
+                </p>
 
                 {entry.original_quote && (
                   <div className="border-l-2 border-muted-foreground/20 pl-3">
                     <p className="text-xs italic text-muted-foreground">
-                      「{entry.original_quote}」
+                      「<TranslatedText text={entry.original_quote} as="span" />」
                     </p>
                   </div>
                 )}

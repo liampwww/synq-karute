@@ -15,6 +15,7 @@ import { toast } from "sonner";
 
 import type { KarteCategory, KarteStatus } from "@/types/database";
 import { useI18n } from "@/lib/i18n/context";
+import { TranslatedText } from "@/components/translated-text";
 import { useAuthStore } from "@/stores/auth-store";
 import {
   getKaruteRecords,
@@ -225,7 +226,7 @@ export function KaruteList() {
                       <div className="flex items-start gap-1.5">
                         <Sparkles className="size-3 mt-0.5 shrink-0 text-violet-500" />
                         <p className="text-xs text-muted-foreground line-clamp-2">
-                          {record.ai_summary}
+                          <TranslatedText text={record.ai_summary} as="span" />
                         </p>
                       </div>
                     )}

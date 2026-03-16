@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { getGemini } from "@/lib/ai/gemini";
 import { getOpenAI } from "@/lib/ai/openai";
-import { getClassificationPrompt } from "@/lib/ai/prompts";
+import { getClassificationPrompt, getClassificationPromptWithHistory } from "@/lib/ai/prompts";
 import type { KarteCategory } from "@/types/database";
 
 const KARTE_CATEGORIES: [KarteCategory, ...KarteCategory[]] = [
@@ -27,15 +27,22 @@ export const ClassificationEntrySchema = z.object({
 
 export const ClassificationResultSchema = z.object({
   summary: z.string(),
+  staffAdvice: z.string().optional(),
   entries: z.array(ClassificationEntrySchema),
 });
 
 export type ClassificationEntry = z.infer<typeof ClassificationEntrySchema>;
 export type ClassificationResult = z.infer<typeof ClassificationResultSchema>;
 
-async function classifyWithGPT(transcript: string, businessType: string): Promise<ClassificationResult> {
+async function classifyWithGPT(
+  transcript: string,
+  businessType: string,
+  customerHistory?: { summary: string; date: string }[]
+): Promise<ClassificationResult> {
   const openai = getOpenAI();
-  const prompt = getClassificationPrompt(businessType);
+  const prompt = customerHistory?.length
+    ? getClassificationPromptWithHistory(businessType, customerHistory)
+    : getClassificationPrompt(businessType);
 
   const response = await openai.chat.completions.create({
     model: "gpt-4o",
@@ -56,9 +63,15 @@ async function classifyWithGPT(transcript: string, businessType: string): Promis
   return ClassificationResultSchema.parse(parsed);
 }
 
-async function classifyWithGemini(transcript: string, businessType: string): Promise<ClassificationResult> {
+async function classifyWithGemini(
+  transcript: string,
+  businessType: string,
+  customerHistory?: { summary: string; date: string }[]
+): Promise<ClassificationResult> {
   const gemini = getGemini();
-  const prompt = getClassificationPrompt(businessType);
+  const prompt = customerHistory?.length
+    ? getClassificationPromptWithHistory(businessType, customerHistory)
+    : getClassificationPrompt(businessType);
 
   const model = gemini.getGenerativeModel({
     model: "gemini-2.5-pro",
@@ -78,16 +91,21 @@ async function classifyWithGemini(transcript: string, businessType: string): Pro
 
 export async function classifyTranscript(
   transcript: string,
-  options?: { model?: "gpt" | "gemini"; businessType?: string }
+  options?: {
+    model?: "gpt" | "gemini";
+    businessType?: string;
+    customerHistory?: { summary: string; date: string }[];
+  }
 ): Promise<ClassificationResult> {
   const model = options?.model ?? "gpt";
   const bizType = options?.businessType ?? "hair";
+  const history = options?.customerHistory;
 
   switch (model) {
     case "gpt":
-      return classifyWithGPT(transcript, bizType);
+      return classifyWithGPT(transcript, bizType, history);
     case "gemini":
-      return classifyWithGemini(transcript, bizType);
+      return classifyWithGemini(transcript, bizType, history);
   }
 }
 
@@ -162,7 +180,9 @@ function mergeResults(
       ? resultA.summary
       : resultB.summary;
 
-  return { summary, entries: merged };
+  const staffAdvice = resultA.staffAdvice || resultB.staffAdvice || undefined;
+
+  return { summary, staffAdvice, entries: merged };
 }
 
 export async function classifyWithCrossValidation(

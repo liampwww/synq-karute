@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { ArrowLeft, Database, Upload, Settings, Play } from "lucide-react";
 
+import { useI18n } from "@/lib/i18n/context";
 import type {
   FieldMapping,
   DedupStrategy,
@@ -19,12 +20,13 @@ import { MigrationProgress } from "./migration-progress";
 type WizardStep = "upload" | "mapping" | "importing" | "done";
 
 const STEP_CONFIG = [
-  { key: "upload" as const, label: "ファイル選択", icon: Upload },
-  { key: "mapping" as const, label: "マッピング", icon: Settings },
-  { key: "importing" as const, label: "インポート", icon: Play },
+  { key: "upload" as const, labelKey: "fileSelect", icon: Upload },
+  { key: "mapping" as const, labelKey: "mapping", icon: Settings },
+  { key: "importing" as const, labelKey: "import", icon: Play },
 ];
 
 export function MigrationWizard() {
+  const { t } = useI18n();
   const organization = useAuthStore((s) => s.organization);
   const activeStaff = useAuthStore((s) => s.staff);
 
@@ -35,7 +37,7 @@ export function MigrationWizard() {
 
   const handleFileSelected = async (file: File) => {
     if (!organization || !activeStaff) {
-      toast.error("組織情報が取得できません");
+      toast.error(t("migration.orgError"));
       return;
     }
 
@@ -50,11 +52,11 @@ export function MigrationWizard() {
       setAnalysis(result.analysis);
       setStep("mapping");
       toast.success(
-        `${result.analysis.totalRows} 件のレコードを検出しました`
+        `${result.analysis.totalRows}${t("migration.recordsDetected")}`
       );
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "ファイルのアップロードに失敗しました"
+        err instanceof Error ? err.message : t("migration.uploadFailed")
       );
     } finally {
       setIsUploading(false);
@@ -72,7 +74,7 @@ export function MigrationWizard() {
       setStep("importing");
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "インポートの開始に失敗しました"
+        err instanceof Error ? err.message : t("migration.importStartFailed")
       );
     }
   };
@@ -115,7 +117,7 @@ export function MigrationWizard() {
                   isActive ? "font-medium" : "text-muted-foreground"
                 }`}
               >
-                {s.label}
+                {t(`migration.${s.labelKey}`)}
               </span>
               {i < STEP_CONFIG.length - 1 && (
                 <div className="mx-2 h-px w-8 bg-border" />
@@ -130,11 +132,10 @@ export function MigrationWizard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Database className="size-5" />
-              データインポート
+              {t("migration.dataImport")}
             </CardTitle>
             <p className="text-sm text-muted-foreground">
-              他のシステムからエクスポートした顧客データをインポートします。
-              CSV / Excel ファイルに対応しています。
+              {t("migration.dataImportDesc")}
             </p>
           </CardHeader>
           <CardContent>
@@ -166,10 +167,9 @@ export function MigrationWizard() {
               <Database className="size-8" />
             </div>
             <div className="text-center space-y-1">
-              <h3 className="text-lg font-semibold">インポート完了</h3>
+              <h3 className="text-lg font-semibold">{t("migration.importComplete")}</h3>
               <p className="text-sm text-muted-foreground">
-                顧客データのインポートが完了しました。
-                顧客一覧ページで確認できます。
+                {t("migration.importCompleteDesc")}
               </p>
             </div>
             <div className="flex gap-2">
@@ -178,7 +178,7 @@ export function MigrationWizard() {
                 className="inline-flex items-center gap-1.5 rounded-md border px-4 py-2 text-sm hover:bg-accent transition-colors"
               >
                 <ArrowLeft className="size-4" />
-                別のファイルをインポート
+                {t("migration.importAnother")}
               </button>
             </div>
           </CardContent>
